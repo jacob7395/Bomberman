@@ -9,15 +9,16 @@ from Error_Report import Report_Error
 
 
 class Sprite_Two_Dimensions(pygame.sprite.Sprite):
-    "Base sprite class form which all custom sprite inherit"
+    """Base sprite class form which all custom sprite inherit."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False):
+    def __init__(self, spawn_Area=(0, 0), fixed=False, asset_List=[]):
+        """Init Function."""
         # Call the parent class (Sprite) constructor
         super(Sprite_Two_Dimensions, self).__init__()
         # set default values if None is passed
         # Area where sprites can spawn
         if(spawn_Area == None):
-            self.spawn_Area = (0, 0, 0, 0)
+            self.spawn_Area = (0, 0)
         else:
             self.spawn_Area = spawn_Area
 
@@ -38,7 +39,17 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         self.image = None
         self.rect = None
 
+        for assets in asset_List:
+            # check all asses propertys exist
+            l = ["s_Res", "s_Start", "s_End", "p_Path", "s_Scale", "s_Flip"]
+            for tag in l:
+                if(Dic_Search(tag, assets) == False):
+                    assets[tag] = None
+            # Load Assets in provides list
+            self.Load_Image(assets["p_Path"], assets["s_Res"], assets["s_Scale"], assets["s_Start"], assets["s_End"], assets["s_Flip"])
+
     def Position(self, *pos):
+        """Function to return and set position if passes a value."""
         if(type(pos) == tuple and len(pos) == 2 and type(pos[0]) == int):
             # chescks the value senf is a tuble and tue tuple has only 2 values witht first value being an int
             # this makes sure only the first tupe of format (x,y) is used
@@ -47,6 +58,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         return (self.position_x, self.position_y)
 
     def Velocity(self, *vel):
+        """Function to return and set velocity if passes a value."""
         if(type(vel) == tuple and len(vel) == 2 and type(vel[0]) == int):
             # chescks the value senf is a tuble and tue tuple has only 2 values witht first value being an int
             # this makes sure only the first tupe of format (x,y) is used
@@ -55,6 +67,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         return (self.velocity_x, self.velocity_y)
 
     def Acceleration(self, *acc):
+        """Function to return and set acceleration if passes a value."""
         if(type(acc) == tuple and len(acc) == 2 and type(acc[0]) == int):
             # chescks the value senf is a tuble and tue tuple has only 2 values witht first value being an int
             # this makes sure only the first tupe of format (x,y) is used
@@ -63,36 +76,35 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         return (self.acceleration_x, self.acceleration_y)
 
     def Locational_Data(self):
+        """Returnes values for Position,Velocity,Acceleration in a tuple."""
         return (self.Position(), self.Velocity(), self.Acceleration())
 
-    def Load_Image(self, file_Path=None, scale=None, x_Res=None):
-        if(file_Path == None):
-            Report_Error("No file path given for %s" % (__name__))
-            return
-
+    def Load_Image(self, file_Path, resolution, sprite_Scale, sprite_Start, sprite_End, sprite_Flip):
         try:
-            # load image then resize te image
-            img = pygame.image.load(os.path.join(file_Path))
+            # Attempt to load sprite sheet
+            self.sheet = pygame.image.load(file_Path)
         except pygame.error:
             Report_Error("%s is an invalid file path" % (file_Path))
             return None
 
-        rect = img.get_rect()
-        # check x_res
-        if(x_Res):
-            scale = self.rect[2] / self.x_res + scale
-        elif(type(scale) == tuple):
-            scale = random.randrange(scale[0], scale[1])
-        elif(scale == None or scale[0] == 0 or scale[1]):
-            Report_Error("No valid scale for 2D Sprite")
-            return None
+        if(sprite_End == None):
+            range_x = 1
+            range_y = 1
+        else:
+            range_x = sprite_End[0] - sprite_Start[0] + 1
+            range_y = sprite_End[1] - sprite_Start[1] + 1
 
-        # resize the image then get new size
-        try:
-            image = pygame.transform.scale(img, (rect[2] / scale, rect[3] / scale))
-        except ZeroDivisionError:
-            Report_Error("Scale was equal to 0 for 2D sprite")
-            return
+        rectange = resolution[0] * sprite_Start[0], resolution[1] * sprite_Start[1], resolution[0] * range_x, resolution[1] * range_y
+
+        rect = pygame.Rect(rectange)
+        image = pygame.Surface(rect.size)
+        image.blit(self.sheet, (0, 0), rect)
+        # Scale the image if the sacle property exitst
+        if(sprite_Scale != None):
+            image = pygame.transform.scale(image, (int(resolution[0] * sprite_Scale), int(resolution[1] * sprite_Scale)))
+        # Flip the sprite if the property exitst
+        if(sprite_Flip != None):
+            image = pygame.transform.flip(image, sprite_Flip[0], sprite_Flip[1])
 
         self.images.append(image)
 
