@@ -28,8 +28,8 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         else:
             self.fixed = fixed
 
-        self.position_x = 0
-        self.position_y = 0
+        self.position_x = spawn_Area[0]
+        self.position_y = spawn_Area[1]
         self.velocity_x = 0
         self.velocity_y = 0
         self.acceleration_x = 0
