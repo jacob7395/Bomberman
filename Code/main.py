@@ -15,6 +15,7 @@ for i in range(0, 1):
 path_JacobLib = path + "/JacobLib"
 path_Sprite = path + "/Sprite"
 path_Assets = os.path.dirname(path) + "/Assets/"
+path_Map_Gen = os.path.dirname(path) + "/Code" + "/Map_Gen"
 
 import sys
 sys.path.insert(0, path_JacobLib)
@@ -25,6 +26,12 @@ from Class_Factory import Class_Factory
 sys.path.insert(0, path_Sprite)
 # import test sprite
 from Example_Sprite import Sprite_Example
+
+sys.path.insert(0, path_Map_Gen)
+# import test sprite
+from Map_Reader import Map_Reader
+
+
 # -----------------------------------------------
 # Reset error file
 Make_Error_File()
@@ -48,9 +55,10 @@ pygame.display.set_caption("Bomberman")
 # Sprite populations and generation
 # This is a list of 'sprites.' Each pepe in the program is
 # added to this list. The list is managed by a class called 'Group.'
+# make backgroud using map reader Function
+background_List = Map_Reader()
 test_List = pygame.sprite.Group()
 # define test asset propertys
-
 test = Sprite_Example((500, 60), False)
 test_List.add(test)
 # populate my pepe_list
@@ -60,6 +68,7 @@ for i in range(0):
     pepe_List.add(Pep)
     all_Sprites_List.add(Pep)
 
+print(test_List)
 # loop until the user clicks the close button.
 done = False
 # used to manage how fast the screen updates
@@ -99,7 +108,7 @@ while not done:
     # background image.
     screen.fill(BLACK)
     # --- Drawing code should go here
-    test_List.draw(screen)
+    background_List.draw(screen)
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second
