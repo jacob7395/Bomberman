@@ -1,7 +1,7 @@
 @startuml
 
 
-Jacob -left-> (Updating Sprite)
+Jacob -left-> (+Updating Sprite)
 Jacob -right-> (Updating UML)
 Adam  -left->  (Controler support)
 Adam  -right->  (Animations)
