@@ -110,6 +110,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
 
     def Set_Image(self, img_Num):
         if(len(self.images) >= img_Num):
+            self.img_Num = img_Num
             self.image = self.images[img_Num]
             self.rect = self.image.get_rect()
             self.rect[0], self.rect[1] = self.position_x, self.position_y
@@ -123,6 +124,13 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
             self.rect[0], self.rect[1] = self.position_x, self.position_y
         except ValueError:
             Report_Error("%s is am invalid spawn value" % (str(self.spawn_Area)))
+
+    def Scale_Imgs(self, scale):
+        """Scale all the images by the value passed."""
+        for x in range(len(self.images)):
+            self.images[x] = pygame.transform.scale(self.images[x], (scale, scale))
+        if(self.img_Num != None):
+            self.Set_Image(self.img_Num)
 
     def Detect_Collitions(Collitions_Sprite_Group, Own_Sprite_Group):
         pass
