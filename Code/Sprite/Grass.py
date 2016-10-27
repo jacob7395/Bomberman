@@ -26,6 +26,9 @@ class Sprite_Grass(Sprite_Two_Dimensions):
 
     def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False):
         """Class init."""
+        # pick random grass tile
+        grass = random.randint(0, 2)
+
         grass_One = {}
         grass_One["s_Res"] = (16, 16)
         grass_One["s_Start"] = (1, 0)
@@ -42,9 +45,10 @@ class Sprite_Grass(Sprite_Two_Dimensions):
         grass_Three["p_Path"] = path_Assets + "bomberman_Sprite_Sheet.png"
 
         asset_List = [grass_One, grass_Two, grass_Three]
+        asset_List = [asset_List[grass]]
+
         # Call the parent class (Sprite) constructor
         super(Sprite_Grass, self).__init__(spawn_Area, fixed, asset_List)
         # Chose the image initaly dispalyed
-        grass = random.randint(0, 2)
-        self.Set_Image(grass)
+        self.Set_Image(0)
         # CUSTOM CODE
