@@ -3,6 +3,8 @@
 import random
 import os
 import time
+import threading
+from multiprocessing.pool import ThreadPool
 
 import pygame
 from pygame import draw, display, rect
@@ -29,7 +31,7 @@ from Example_Sprite import Sprite_Example
 
 sys.path.insert(0, path_Map_Gen)
 # import test sprite
-from Map_Reader import Map_Reader
+from Map_Maker import Map_Load
 
 
 # -----------------------------------------------
@@ -45,8 +47,9 @@ RED = (255,   0,   0)
 # default pygame init functions
 pygame.init()
 # Set the width and height of the screen [width, height]
-screen_Size = (700, 500)
+screen_Size = (1280, 720)
 screen = display.set_mode(screen_Size)
+scree_Fullscreen = True
 # Define spawn Area
 spawn_Area = (-100, -50, 0, screen_Size[1])
 # Set game window
@@ -56,7 +59,8 @@ pygame.display.set_caption("Bomberman")
 # This is a list of 'sprites.' Each pepe in the program is
 # added to this list. The list is managed by a class called 'Group.'
 # make backgroud using map reader Function
-background_List = Map_Reader()
+# background runs in a threadList
+background_List = Map_Load(screen_Size)
 test_List = pygame.sprite.Group()
 # define test asset propertys
 test = Sprite_Example((500, 60), False)
@@ -68,7 +72,6 @@ for i in range(0):
     pepe_List.add(Pep)
     all_Sprites_List.add(Pep)
 
-print(test_List)
 # loop until the user clicks the close button.
 done = False
 # used to manage how fast the screen updates
@@ -96,6 +99,16 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F1:
+                if scree_Fullscreen == True:
+                    screen = display.set_mode(screen_Size)
+                    scree_Fullscreen = False
+                else:
+                    screen = display.set_mode(screen_Size, pygame.FULLSCREEN)
+                    scree_Fullscreen = True
+            elif event.key == pygame.K_F2:
+                done = True
 
     # --- Game logic should go here
 
