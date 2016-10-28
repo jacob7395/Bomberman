@@ -24,6 +24,8 @@ sys.path.insert(0, path_Sprites)
 from Wall import Sprite_Wall
 from Grass import Sprite_Grass
 from Pillar import Sprite_Pillar
+from Bush import Sprite_Bush
+from Spawn import Sprite_Spawn
 
 
 def Map_Load(screen_Size):
@@ -41,9 +43,12 @@ def Map_Load(screen_Size):
     # Make sprite factorys for each sprite
     wall_Factory = Class_Factory("WallID", Sprite_Wall)
     grass_Factory = Class_Factory("GrassID", Sprite_Grass)
-    pillar_Factory = Class_Factory("GrassID", Sprite_Pillar)
+    pillar_Factory = Class_Factory("PillarID", Sprite_Pillar)
+    bush_Factory = Class_Factory("BushID", Sprite_Bush)
+    spawn_Factory = Class_Factory("SpawnID", Sprite_Spawn)
     # make a list for the baground this will be retuned
     background_List = pygame.sprite.Group()
+    bush_List = pygame.sprite.Group()
     # Read each line of the map
     with open(path_Maps, "r") as f:
         lines = f.readlines()
@@ -61,13 +66,24 @@ def Map_Load(screen_Size):
                 sprite = grass_Factory.New((x, y), True)
             elif(character == 'p'):
                 sprite = pillar_Factory.New((x, y), True)
-            sprite.Scale_Imgs(map_Info[0])
-            background_List.add(sprite)
+            elif(character == 'b'):
+                sprite1 = grass_Factory.New((x, y), True)
+                sprite2 = bush_Factory.New((x, y), True)
+            elif(character == 's'):
+                sprite = spawn_Factory.New((x, y), True)
+            if(character == 'b'):
+                sprite1.Scale_Imgs(map_Info[0])
+                sprite2.Scale_Imgs(map_Info[0])
+                background_List.add(sprite1)
+                bush_List.add(sprite2)
+            else:
+                sprite.Scale_Imgs(map_Info[0])
+                background_List.add(sprite)
             x += map_Info[0]
         x = x_Offset
         y += map_Info[0]
     # return the populated background_List
-    return background_List
+    return [background_List, bush_List]
 
 
 def Map_Gen(screen_Size=None, file_Path=None, x_Size=42):
@@ -101,15 +117,24 @@ def Map_Gen(screen_Size=None, file_Path=None, x_Size=42):
 def Map_Maker(x_End, y_End, f):
     """Generate a map that is x_End by y_End where n is the file to put the map in."""
     for n in range((x_End * y_End) - 1, -1, -1):
-        current_Line = n / x_End + 1
+        current_y = n / x_End + 1
         last_Line = (n + 1) / x_End + 1
+        current_x = (n % x_End)
 
-        if(current_Line != last_Line and n < (x_End * y_End) - 2):
+        if(current_y != last_Line and n < (x_End * y_End) - 2):
             f.write('\n')
 
-        if(current_Line == y_End or current_Line == 1 or n % x_End == 0 or (n + 1) % x_End == 0):
+        if(current_y == y_End or current_y == 1 or current_x == 0 or current_x == x_End - 1):
             f.write('w')
-        elif((n % x_End) % 2 == 0 and current_Line % 2 == 1):
+        elif(current_x % 2 == 0 and current_y % 2 == 1):
             f.write('p')
+        elif((current_y == y_End - 1 or current_y == y_End - 2 or current_y == 2 or current_y == 3) and (current_x == 1 or current_x == 2 or current_x == x_End - 2 or current_x == x_End - 3)):
+            f.write('s')
         else:
-            f.write('g')
+            if(random.randint(0, 2) == 0):
+                f.write('g')
+            else:
+                f.write('b')
+
+# screen_Size = (1280, 720)
+# background_List = Map_Load(screen_Size)

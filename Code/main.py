@@ -60,7 +60,13 @@ pygame.display.set_caption("Bomberman")
 # added to this list. The list is managed by a class called 'Group.'
 # make backgroud using map reader Function
 # background runs in a threadList
-background_List = Map_Load(screen_Size)
+sprite_Lists = Map_Load(screen_Size)
+background_List = sprite_Lists[0]
+bush_List = sprite_Lists[1]
+# adds alpha color for bushes, color = default = BLACK = (0,0,0)
+for sprite in bush_List:
+    sprite.Alphe_Con()
+
 test_List = pygame.sprite.Group()
 # define test asset propertys
 test = Sprite_Example((500, 60), False)
@@ -122,6 +128,7 @@ while not done:
     screen.fill(BLACK)
     # --- Drawing code should go here
     background_List.draw(screen)
+    bush_List.draw(screen)
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second
