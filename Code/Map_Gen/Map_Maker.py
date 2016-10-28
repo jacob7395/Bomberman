@@ -99,7 +99,7 @@ def Map_Gen(screen_Size=None, file_Path=None, x_Size=42):
 
 
 def Map_Maker(x_End, y_End, f):
-    """Generates a map that is x_End by y_End where n is the file to put the map in."""
+    """Generate a map that is x_End by y_End where n is the file to put the map in."""
     for n in range((x_End * y_End) - 1, -1, -1):
         current_Line = n / x_End + 1
         last_Line = (n + 1) / x_End + 1
