@@ -28,14 +28,16 @@ from Pillar import Sprite_Pillar
 
 def Map_Load(screen_Size):
     """Read the map file then returns the group for that."""
-    print("Running")
+    x_Size = 42
     # Setup map path
     path = os.path.realpath(__file__)
     for i in range(0, 2):
         path = os.path.dirname(path)
     path_Maps = path + "/Map_Gen/" + "Map"
     # Generate the map file
-    scale = Map_Gen(screen_Size, path_Maps)
+    # map_Info[0] = size of each block by pixles where x*x
+    # map_Info[1] = contains a tubple where [1][0] is #x blocks and [1][1] is #y blocks
+    map_Info = Map_Gen(screen_Size, path_Maps, x_Size)
     # Make sprite factorys for each sprite
     wall_Factory = Class_Factory("WallID", Sprite_Wall)
     grass_Factory = Class_Factory("GrassID", Sprite_Grass)
@@ -47,8 +49,9 @@ def Map_Load(screen_Size):
         lines = f.readlines()
         f.close
 
+    x_Offset = (screen_Size[0] - (map_Info[0] * map_Info[1][0])) / 2
     y = 0
-    x = 0
+    x = x_Offset
 
     for line in lines:
         for character in line:
@@ -58,26 +61,29 @@ def Map_Load(screen_Size):
                 sprite = grass_Factory.New((x, y), True)
             elif(character == 'p'):
                 sprite = pillar_Factory.New((x, y), True)
-            sprite.Scale_Imgs(scale)
+            sprite.Scale_Imgs(map_Info[0])
             background_List.add(sprite)
-            x += scale
-        x = 0
-        y += scale
+            x += map_Info[0]
+        x = x_Offset
+        y += map_Info[0]
     # return the populated background_List
     return background_List
 
 
-def Map_Gen(screen_Size=None, file_Path=None):
-    """Map_Gen crates a file called Map, this text file contains a map.
-       It then populates Map with walles and pillers for the spesific screen screen_Size.
-       It also returns a scale size for the blocks to fill the screen correclty"""
+def Map_Gen(screen_Size=None, file_Path=None, x_Size=42):
+    """
+    Map_Gen crates a file called Map, this text file contains a map using characters as notation.
+
+    It then populates Map with walles and pillers for the spesific screen screen_Size.
+    It also returns a scale size for the blocks to fill the screen correclty.
+    """
     # cheack a screen size has been sent
     if(screen_Size == None):
         return None
     # open the file with w to make/clear
     f = open(file_Path, "w")
-
-    map_Size = [42]
+    # The x map size controls the y map size on a 16:9 aspect ration
+    map_Size = [x_Size]
     map_Size.append(int(map_Size[0] / 1.8260869565))
 
     # Makes sure the map can be generated and corrects squeres if unable
@@ -87,12 +93,13 @@ def Map_Gen(screen_Size=None, file_Path=None):
 
     scale = int(screen_Size[0] / map_Size[0])
 
-    Map_Maker(0, map_Size[0], map_Size[1], f)
+    Map_Maker(map_Size[0], map_Size[1], f)
 
-    return scale
+    return [scale, map_Size]
 
 
-def Map_Maker(n, x_End, y_End, f):
+def Map_Maker(x_End, y_End, f):
+    """Generates a map that is x_End by y_End where n is the file to put the map in."""
     for n in range((x_End * y_End) - 1, -1, -1):
         current_Line = n / x_End + 1
         last_Line = (n + 1) / x_End + 1
