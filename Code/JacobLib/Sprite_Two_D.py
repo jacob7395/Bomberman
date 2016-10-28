@@ -134,3 +134,6 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
 
     def Detect_Collitions(Collitions_Sprite_Group, Own_Sprite_Group):
         pass
+
+    def Alphe_Con(self, color_Key=(0, 0, 0)):
+        self.image.set_colorkey(color_Key, pygame.RLEACCEL)
