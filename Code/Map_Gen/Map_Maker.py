@@ -131,7 +131,7 @@ def Map_Maker(x_End, y_End, f):
         elif((current_y == y_End - 1 or current_y == y_End - 2 or current_y == 2 or current_y == 3) and (current_x == 1 or current_x == 2 or current_x == x_End - 2 or current_x == x_End - 3)):
             f.write('s')
         else:
-            if(random.randint(0, 2) == 0):
+            if(random.randint(0, 100) <= 60):
                 f.write('g')
             else:
                 f.write('b')
