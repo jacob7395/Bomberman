@@ -24,7 +24,7 @@ from Class_Factory import Class_Factory
 class Sprite_Bush(Sprite_Two_Dimensions):
     """Test fucntion for sprite init."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False):
+    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None):
         """Class init."""
         # pick random grass tile
         grass = random.randint(0, 2)
@@ -33,6 +33,7 @@ class Sprite_Bush(Sprite_Two_Dimensions):
         bush_One["s_Res"] = (16, 16)
         bush_One["s_Start"] = (3, 0)
         bush_One["p_Path"] = path_Assets + "bomberman_Sprite_Sheet.png"
+        bush_One["s_Scale"] = sprite_Scale
 
         asset_List = [bush_One]
 

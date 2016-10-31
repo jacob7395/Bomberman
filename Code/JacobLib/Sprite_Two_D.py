@@ -101,7 +101,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         image.blit(self.sheet, (0, 0), rect)
         # Scale the image if the sacle property exitst
         if(sprite_Scale != None):
-            image = pygame.transform.scale(image, (int(resolution[0] * sprite_Scale), int(resolution[1] * sprite_Scale)))
+            image = pygame.transform.scale(image, (sprite_Scale, sprite_Scale))
         # Flip the sprite if the property exitst
         if(sprite_Flip != None):
             image = pygame.transform.flip(image, sprite_Flip[0], sprite_Flip[1])
@@ -136,4 +136,6 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         pass
 
     def Alphe_Con(self, color_Key=(0, 0, 0)):
+        for image in self.images:
+            image.set_colorkey(color_Key, pygame.RLEACCEL)
         self.image.set_colorkey(color_Key, pygame.RLEACCEL)

@@ -21,20 +21,20 @@ from Error_Report import Report_Error
 from Class_Factory import Class_Factory
 
 
-class Sprite_Wall(Sprite_Two_Dimensions):
+class Sprite_Brick(Sprite_Two_Dimensions):
     """Test fucntion for sprite init."""
 
     def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None):
         """Class init."""
-        wall = {}
-        wall["s_Res"] = (16, 16)
-        wall["s_Start"] = (11, 5)
-        wall["p_Path"] = path_Assets + "bomberman_Sprite_Sheet.png"
-        wall["s_Scale"] = sprite_Scale
+        spawn = {}
+        spawn["s_Res"] = (16, 16)
+        spawn["s_Start"] = (14, 14)
+        spawn["p_Path"] = path_Assets + "16bit_Ground_Sheet.gif"
+        spawn["s_Scale"] = sprite_Scale
 
-        asset_List = [wall]
+        asset_List = [spawn]
         # Call the parent class (Sprite) constructor
-        super(Sprite_Wall, self).__init__(spawn_Area, fixed, asset_List)
+        super(Sprite_Brick, self).__init__(spawn_Area, fixed, asset_List)
         # Chose the image initaly dispalyed
         self.Set_Image(0)
         # CUSTOM CODE

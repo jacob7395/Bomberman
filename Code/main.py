@@ -5,9 +5,10 @@ import os
 import time
 import threading
 from multiprocessing.pool import ThreadPool
+from multiprocessing import Process, Queue
 
 import pygame
-from pygame import draw, display, rect
+from pygame import draw, display, rect, mouse
 from pygame.sprite import groupcollide
 # setup to improt files fomr MyLib
 path = os.path.realpath(__file__)
@@ -26,8 +27,8 @@ from Error_Report import Report_Error, Make_Error_File
 from Class_Factory import Class_Factory
 
 sys.path.insert(0, path_Sprite)
-# import test sprite
-from Example_Sprite import Sprite_Example
+# import bomb sprite
+from Bomb import Sprite_Bomb
 
 sys.path.insert(0, path_Map_Gen)
 # import test sprite
@@ -63,20 +64,14 @@ pygame.display.set_caption("Bomberman")
 sprite_Lists = Map_Load(screen_Size)
 background_List = sprite_Lists[0]
 bush_List = sprite_Lists[1]
+sprite_Scale = sprite_Lists[2]
+# bomb group and factry init
+bomb_List = pygame.sprite.Group()
+bomb_Factory = Class_Factory("BombID", Sprite_Bomb)
+bomb_Queue = Queue()
 # adds alpha color for bushes, color = default = BLACK = (0,0,0)
 for sprite in bush_List:
     sprite.Alphe_Con()
-
-test_List = pygame.sprite.Group()
-# define test asset propertys
-test = Sprite_Example((500, 60), False)
-test_List.add(test)
-# populate my pepe_list
-for i in range(0):
-    Pep = test_Factory.New(spawn_Area, False, (3, 10))
-    # add pepe to sprite lists
-    pepe_List.add(Pep)
-    all_Sprites_List.add(Pep)
 
 # loop until the user clicks the close button.
 done = False
@@ -115,9 +110,17 @@ while not done:
                     scree_Fullscreen = True
             elif event.key == pygame.K_F2:
                 done = True
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos = mouse.get_pos()
+            bomb = bomb_Factory.New(pos, False, sprite_Scale, 2)
+            bomb.Alphe_Con()
+            bomb_List.add(bomb)
 
     # --- Game logic should go here
-
+    # Update curret bombs
+    for bomb in bomb_List:
+        if(bomb.update() == True):
+            bomb_List.remove(bomb)
     # --- Screen-clearing code goes here
 
     # Here, we clear the screen to white. Don't put other drawing commands
@@ -129,6 +132,7 @@ while not done:
     # --- Drawing code should go here
     background_List.draw(screen)
     bush_List.draw(screen)
+    bomb_List.draw(screen)
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second

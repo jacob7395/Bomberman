@@ -24,12 +24,13 @@ from Class_Factory import Class_Factory
 class Sprite_Pillar(Sprite_Two_Dimensions):
     """Test fucntion for sprite init."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False):
+    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None):
         """Class init."""
         grass = {}
         grass["s_Res"] = (16, 16)
         grass["s_Start"] = (11, 4)
         grass["p_Path"] = path_Assets + "bomberman_Sprite_Sheet.png"
+        grass["s_Scale"] = sprite_Scale
 
         asset_List = [grass]
         # Call the parent class (Sprite) constructor
