@@ -15,5 +15,6 @@ class Class_Factory:
 
         new_Class = self.baseClass(*args)
         new_Class.__class__ = name
-        new_Class.__name__ = name
+        new_Class.__name__ = self.name + str(self.classID)
+        new_Class.ID = self.classID
         return new_Class
