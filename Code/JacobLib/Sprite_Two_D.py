@@ -41,12 +41,20 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
 
         for assets in asset_List:
             # check all asses propertys exist
-            l = ["s_Res", "s_Start", "s_End", "p_Path", "s_Scale", "s_Flip"]
+            l = ["s_Res", "s_Start", "s_End", "p_Path", "s_Scale", "s_Flip", "s_Annimated_Len", "s_Name"]
             for tag in l:
                 if(Dic_Search(tag, assets) == False):
                     assets[tag] = None
-            # Load Assets in provides list
-            self.Load_Image(assets["p_Path"], assets["s_Res"], assets["s_Scale"], assets["s_Start"], assets["s_End"], assets["s_Flip"])
+            if(assets["s_Name"] != None and type(self.images) != dict):
+                self.images = {}
+
+            if(assets["s_Annimated_Len"] == None):
+                # Load Assets in provides list
+                self.Load_Image(assets["p_Path"], assets["s_Res"], assets["s_Scale"], assets["s_Start"], assets["s_End"], assets["s_Flip"], assets["s_Name"])
+            else:
+                self.images.update({assets["s_Name"]: []})
+                for x in range(0, assets["s_Annimated_Len"]):
+                    self.Load_Image(assets["p_Path"], assets["s_Res"], assets["s_Scale"], assets["s_Start"], assets["s_End"], assets["s_Flip"], assets["s_Name"], x)
 
     def Position(self, *pos):
         """Function to return and set position if passes a value."""
@@ -56,6 +64,14 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
             self.position_x, self.position_y = pos[0], pos[1]
 
         return (self.position_x, self.position_y)
+
+    def Incroment_Position(self, *pos):
+        """Function that incroments the position by passes valuse."""
+        if(type(pos) == tuple and len(pos) == 2 and type(pos[0]) == int):
+            # chescks the value senf is a tuble and tue tuple has only 2 values witht first value being an int
+            # this makes sure only the first tupe of format (x,y) is used
+            self.position_x += pos[0]
+            self.position_y += pos[1]
 
     def Velocity(self, *vel):
         """Function to return and set velocity if passes a value."""
@@ -79,7 +95,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         """Returnes values for Position,Velocity,Acceleration in a tuple."""
         return (self.Position(), self.Velocity(), self.Acceleration())
 
-    def Load_Image(self, file_Path, resolution, sprite_Scale, sprite_Start, sprite_End, sprite_Flip):
+    def Load_Image(self, file_Path, resolution, sprite_Scale, sprite_Start, sprite_End, sprite_Flip, name, img_Num=0):
         try:
             # Attempt to load sprite sheet
             self.sheet = pygame.image.load(file_Path)
@@ -94,7 +110,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
             range_x = sprite_End[0] - sprite_Start[0] + 1
             range_y = sprite_End[1] - sprite_Start[1] + 1
 
-        rectange = resolution[0] * sprite_Start[0], resolution[1] * sprite_Start[1], resolution[0] * range_x, resolution[1] * range_y
+        rectange = resolution[0] * sprite_Start[0] + resolution[0] * img_Num, resolution[1] * sprite_Start[1], resolution[0] * range_x, resolution[1] * range_y
 
         rect = pygame.Rect(rectange)
         image = pygame.Surface(rect.size)
@@ -106,9 +122,17 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         if(sprite_Flip != None):
             image = pygame.transform.flip(image, sprite_Flip[0], sprite_Flip[1])
 
-        self.images.append(image)
+        if(name == None):
+            self.images.append(image)
+        else:
+            self.images[name].append(image)
 
     def Set_Image(self, img_Num):
+        if(type(self.images) == dict):
+            self.img_Name = img_Num
+            self.image = self.images[img_Num][self.index]
+            self.rect = self.image.get_rect()
+            self.rect[0], self.rect[1] = self.position_x, self.position_y
         if(len(self.images) >= img_Num):
             self.img_Num = img_Num
             self.image = self.images[img_Num]
@@ -116,6 +140,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
             self.rect[0], self.rect[1] = self.position_x, self.position_y
         else:
             Report_Error("%s is not an image in Sprite.images" % (img_Num))
+        self.Alphe_Con()
 
     def Set_Spawn(self):
         try:
@@ -123,7 +148,7 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
             self.position_y = random.randrange(self.spawn_Area[2], self.spawn_Area[3])
             self.rect[0], self.rect[1] = self.position_x, self.position_y
         except ValueError:
-            Report_Error("%s is am invalid spawn value" % (str(self.spawn_Area)))
+            Report_Error("%s is an invalid spawn value" % (str(self.spawn_Area)))
 
     def Scale_Imgs(self, scale):
         """Scale all the images by the value passed."""
@@ -136,6 +161,9 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         pass
 
     def Alphe_Con(self, color_Key=(0, 0, 0)):
-        for image in self.images:
-            image.set_colorkey(color_Key, pygame.RLEACCEL)
-        self.image.set_colorkey(color_Key, pygame.RLEACCEL)
+        if(type(self.images) != dict):
+            for image in self.images:
+                image.set_colorkey(color_Key, pygame.RLEACCEL)
+
+        if(self.image):
+            self.image.set_colorkey(color_Key, pygame.RLEACCEL)
