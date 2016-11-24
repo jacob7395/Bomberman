@@ -1,8 +1,0 @@
-ID	Name	Walkable (Y/N) 	ImageX	ImageY
-0	Border	N		176	80
-1	Grass	Y		16	0
-2	Grass	Y		32	0
-3	Rock	N		0	0
-4	Rock	N		0	0
-5	Rock	N		0	0
-6	Grass	N		48	0
