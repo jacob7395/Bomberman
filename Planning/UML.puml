@@ -4,7 +4,7 @@ http://plantuml.com/class-diagram
 
 @startuml
 
-package Sprite_Gen <<rect>> {
+package Sprite_Gen{
   class Sprite_Two_Dimensions {
     Base sprite class from which all custom sprites inherit
     ==
@@ -22,22 +22,205 @@ package Sprite_Gen <<rect>> {
     ==
     Funtions
     --
-    - __inti__(spawn_area, fixed)
+    - __inti__(spawn_area, spawn_Area=(0, 0), fixed=False, asset_List=[])
     # Functions to send or resive velocirt or position_x
     # if nothing is sent the values will be unchanged
     + Position(*pos = (x,y)) : (x,y)
+    + Incroment_Position(pos)
     + Velocity(*vel = (x,y)) : (x,y)
     + Acceleration(*vos = (x,y)) : (x,y)
     + Locational_Data() : (Position,Velocity,Acceleration)
     #Img functions
     + Load_Image (file_Path, scale, x_res) : img_Count
     + Set_Image(img_Num)
+    + Scale_Imgs(scale)
+    + Alphe_Con(color_Key = (0,0,0))
+    #Sprite Functions
+    + get_Collision_Coners()
+    + get_Sprite_Center()
+    #Animation functions
+    + incroment_Animation_Index()
 
   }
-}
 
-package Map_Gen <<rect>> {
-  
+  class Sprite_Player {
+    Any sprite class that directy intaracts with a player inherats from here
+    ==
+    Vars
+    --
+    + t_Acc_Old
+    + self.index
+    ==
+    Funtions
+    --
+    - __inti__(spawn_Area=(0, 0), fixed=False, asset_List=[], sprite_Scale=16)
+    + check_Neighbor_Tiles(map_Object)
+    + position_In_Collition(pos)
+    + check_Move(move,map_Object)
+    + check_Bomb(map_Object,position)
+    + Calc_Accleration()
 
+  }
+
+  class Bomberman {
+    The sprite each player directly controlles
+    ==
+    Vars
+    --
+    + index = 0
+    + runing = false
+    + current_Image_Name = "Down"
+    + speed = 200
+    + animation_Rate = 65
+    + t = 0
+    + oldt = 0
+    + scale = sprite_Scale
+    + collition_Offset = 20
+    + kill_Me = True
+    #Bomb props
+    + bomb_List = pygame.sprite.Group()
+    + bomb_Factory = Class_Factory("Bomb", Sprite_Bomb)
+    + spawn_B = False
+    + bomb_Movable = False
+    + bomb_Kick_Power = 200
+    + bomb_Slow_Rate = 2
+    + bomb_Count = 5
+    + bomb_Start_Replenishment = False
+    + bomb_Next_Replenishment = 0
+    + bomb_Replenish_Rate = 1
+    + bomb_Fuse_Time = 2
+    + bomb_Explotion_Size = 2
+    ==
+    Funtions
+    --
+    - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, sprite_Man=0)
+    + begin_running()
+    + stop_running()
+    + update_Positions()
+    + spawn_Bomb(map_Object)
+    + update(map_Object)
+  }
+  package Bomb{
+    class Sprite_Bomb {
+      The sprite each player directly controlles
+      ==
+      Vars
+      --
+      + current_Image_Name = "bomb"
+      + collition_Offset = 10
+      + scale = sprite_Scale
+      + change_Time = float(fuse_Time) / 3
+      + t_Old = time.clock()
+      + collition_Offset = 5
+      + decceleration = 1
+      + v_Start =  = (0, 0)
+      + bomb_Countdown = True
+      + bomberman = bomberman
+      #Timer varibles
+      + init_Time = time.clock()
+      + blow_Time = self.init_Time + (float(fuse_Time))
+      + fuse_Time = float(fuse_Time)
+      + old_Tile = None
+      #Explotion varibles
+      + explotion_List = pygame.sprite.Group()
+      + explotion_Factory = Class_Factory("Explotion_Base", Sprite_Explotion_Base)
+      + explotion_Begin = False
+      + explotion_Size = explotion_Size
+      #Bomb props
+      + bomb_List = pygame.sprite.Group()
+      + bomb_Factory = Class_Factory("Bomb", Sprite_Bomb)
+      + spawn_B = False
+      + bomb_Movable = False
+      + bomb_Kick_Power = 200
+      + bomb_Slow_Rate = 2
+      + bomb_Count = 5
+      + bomb_Start_Replenishment = False
+      + bomb_Next_Replenishment = 0
+      + bomb_Replenish_Rate = 1
+      + bomb_Fuse_Time = 2
+      + bomb_Explotion_Size = 2
+      ==
+      Funtions
+      --
+      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
+                  sprite_Scale=None, sprite_Man=0,
+                    bomberman = None)
+      + update_Positions()
+      + spawn_Explotion(map_Object)
+      + update(map_Object)
+    }
+
+    class Sprite_Explotion_Base {
+      The first explotion sprite spawned
+      ==
+      Vars
+      --
+      # explotion varibles
+      + explotion_Arm_List = pygame.sprite.Group()
+      + explotion_Arm_Factory = Class_Factory("Explotion_Arm", Sprite_Explotion_Arm)
+      + explotion_Growing = True
+      + explotion_Groth_Rate = 0.01
+      + explotion_Timeout = 0.25
+      ==
+      Funtions
+      --
+      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
+                  sprite_Scale=None, map_Object=None,
+                    explotion_Size=2, bomb=None)
+      + update(map_Object)
+    }
+
+    class Sprite_Explotion_Arm {
+      The subseqant explotion sprite spawned by explotion base
+      ==
+      Vars
+      --
+      # explotion arm props
+      + explotion_Base = explotion_Base
+      + direction = direction
+      ==
+      Funtions
+      --
+      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
+                  sprite_Scale=None, map_Object=None,
+                    direction=None, bomb=None, explotion_Base=None,
+                      explotion_Groth_Rate=None, explotion_Size=None)
+      + update(map_Object)
+    }
+
+    class Sprite_Explotion{
+      The subseqant explotion sprite spawned by explotion base
+      ==
+      Vars
+      --
+      # bomb propertys
+      self.current_Image_Name = None
+      # bomb props
+      + collition_Offset = 2
+      + scale = sprite_Scale
+      + bomb = bomb
+      # explotion props
+      + explotion_Base = explotion_Base
+      + explotion_Grown = False
+      + explotion_Size = explotion_Size
+      + explotion_Groth_Rate = explotion_Groth_Rate
+      + explotion_Change_Time = time.clock() + self.explotion_Groth_Rate
+      + direction = direction
+      + bushes_to_Destroyed = []
+      ==
+      Funtions
+      --
+      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
+                  sprite_Scale=None, map_Object=None,
+                    explotion_Size=2,bomb = None)
+    }
+  }
+
+  Sprite_Player <-down- Sprite_Two_Dimensions
+  Bomberman <-down- Sprite_Player
+  Sprite_Bomb <-down- Sprite_Player
+  Sprite_Explotion <-down- Sprite_Player
+  Sprite_Explotion_Base <-down- Sprite_Explotion
+  Sprite_Explotion_Arm <-down- Sprite_Explotion
 }
 @enduml

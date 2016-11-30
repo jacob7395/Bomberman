@@ -8,7 +8,7 @@ from multiprocessing.pool import ThreadPool
 from multiprocessing import Process, Queue
 
 import pygame
-from pygame import draw, display, rect, mouse
+from pygame import draw, display, rect, mouse, joystick
 from pygame.sprite import groupcollide
 # setup to improt files fomr MyLib
 path = os.path.realpath(__file__)
@@ -17,6 +17,7 @@ for i in range(0, 1):
 # File path for custom liberys
 path_JacobLib = path + "/JacobLib"
 path_Sprite = path + "/Sprite"
+controller_Sprite = path + "/controller"
 path_Assets = os.path.dirname(path) + "/Assets/"
 path_Map_Gen = os.path.dirname(path) + "/Code" + "/Map_Gen"
 
@@ -25,6 +26,10 @@ sys.path.insert(0, path_JacobLib)
 # import from MyLib
 from Error_Report import Report_Error, Make_Error_File
 from Class_Factory import Class_Factory
+
+sys.path.insert(0, controller_Sprite)
+# import from controller
+from controller import controller_Object
 
 sys.path.insert(0, path_Sprite)
 # import bomb sprite
@@ -56,7 +61,8 @@ RED = (255,   0,   0)
 # default pygame init functions
 pygame.init()
 # Set the width and height of the screen [width, height]
-screen_Size = (1280, 720)
+screen_Size = (714, 374)
+# screen_Size = (1428, 748)
 screen = display.set_mode(screen_Size)
 scree_Fullscreen = True
 # Define spawn Area
@@ -73,29 +79,35 @@ sprite_Lists = Map_Load(screen_Size, 21)
 background_List = sprite_Lists[0]
 bDrwan = False
 bush_List = sprite_Lists[1]
+bushes_to_Destroyed = []
 wall_List = sprite_Lists[2]
 sprite_Scale = sprite_Lists[3]
+Map_O = sprite_Lists[4]
 # bomb group and factry init
 bomb_List = pygame.sprite.Group()
-bomb_Factory = Class_Factory("Bomb", Sprite_Bomb)
+explotion_List = pygame.sprite.Group()
 # make bomber man
+# get number of plugged in controllers
+number_Of_Players = joystick.get_count()
 man_List = pygame.sprite.Group()
 man_Factory = Class_Factory("Man", Sprite_Bomberman)
 man_Count = 0
-for x in background_List:
-    if(x.class_Name == "Spawn"):
-        man = man_Factory.New(x.Position(), False, sprite_Scale, man_Count)
-        man.Alphe_Con()
+for tile in background_List:
+    if(tile.class_Name == "Spawn" and man_Count < number_Of_Players):
+        man = man_Factory.New(tile.Position(), False, sprite_Scale, man_Count)
         man_List.add(man)
         man_Count += 1
-# adds alpha color for bushes, color = default = BLACK = (0,0,0)
-for sprite in bush_List:
-    sprite.Alphe_Con()
+# controller initalization
+controllers = []
+for count in range(joystick.get_count()):
+    for bomberman in man_List:
+        if(bomberman.ID - 1 == count):
+            controllers.append(controller_Object(bomberman, count))
 
-# loop until the user clicks the close button.
 done = False
 # used to manage how fast the screen updates
 clock = pygame.time.Clock()
+oldrects = pygame.Rect(10, 10, 10, 10)
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -112,109 +124,63 @@ while not done:
                     scree_Fullscreen = True
             elif event.key == pygame.K_F2:
                 done = True
-            elif event.key == pygame.K_w:
-                for man in man_List:
-                    if man.ID == 1:
-                        man.current_Direction = "man_Up"
-                        man.begin_Run()
-            elif event.key == pygame.K_s:
-                for man in man_List:
-                    if man.ID == 1:
-                        man.current_Direction = "man_Down"
-                        man.begin_Run()
-            elif event.key == pygame.K_d:
-                for man in man_List:
-                    if man.ID == 1:
-                        man.current_Direction = "man_Right"
-                        man.begin_Run()
-            elif event.key == pygame.K_a:
-                for man in man_List:
-                    if man.ID == 1:
-                        man.current_Direction = "man_Left"
-                        man.begin_Run()
-            elif event.key == pygame.K_SPACE:
-                for man in man_List:
-                    if man.ID == 1:
-                        bomb = bomb_Factory.New(man.Position(), False, sprite_Scale, 1)
-                        bomb.Alphe_Con()
-                        bomb_List.add(bomb)
+    # --- Update controller logic loop
+    for controller in controllers:
+        controller.EventManager()
 
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                for man in man_List:
-                    if man.ID == 1:
-                        if(man.current_Direction == "man_Up"):
-                            man.stop_Run()
-            elif event.key == pygame.K_s:
-                for man in man_List:
-                    if man.ID == 1:
-                        if(man.current_Direction == "man_Down"):
-                            man.stop_Run()
-            elif event.key == pygame.K_a:
-                for man in man_List:
-                    if man.ID == 1:
-                        if(man.current_Direction == "man_Left"):
-                            man.stop_Run()
-            elif event.key == pygame.K_d:
-                for man in man_List:
-                    if man.ID == 1:
-                        if(man.current_Direction == "man_Right"):
-                            man.stop_Run()
-        # Mouse click event currently spawning bomb
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            pos = mouse.get_pos()
-            bomb = bomb_Factory.New(pos, False, sprite_Scale, 1)
-            bomb.Alphe_Con()
-            bomb_List.add(bomb)
-
-    # --- Game logic should go here
-    # Calculate collitions with Bman
-    man_Collitions = pygame.sprite.groupcollide(man_List, wall_List, False, False)
-    man_Collitions.update(pygame.sprite.groupcollide(man_List, bush_List, False, False))
-    if(man_Collitions):
-        for man in man_Collitions.keys():
-            man.stop_Run()
-            collition_Pos = man_Collitions[man][0].Position()
-            man.Position(man.position_Old[0], man.position_Old[1])
-    # Update curret bombs
-    for bomb in bomb_List:
-        if(bomb.update() == True):
-            bomb_List.remove(bomb)
+    # --- Game logic should go hered
     for man in man_List:
-        man.update()
-        if(man.ID == 1):
-            pass
-            # print("Pos:" + str(man.Position()))
+        bomb_List.add(man.update(Map_O))
+        # check if men are in explotion
+        for explotion in explotion_List:
+            # if a man is in any explotion remove them from existance
+            if(explotion.position_In_Collition(man.get_Sprite_Center()) == True):
+                man_List.remove(man)
 
-            # if(man.current_Direction == "man_Down" or man.current_Direction == "man_Up"):
-            #     S = sign(collition_Pos[1] - man.Position()[1])
-            #     man.position_y = collition_Pos[1] + sprite_Scale * S
-            # elif(man.current_Direction == "man_Left" or man.current_Direction == "man_Right"):
-            #     S = sign(collition_Pos[0] - man.Position()[0])
-            #     man.position_x = collition_Pos[0] + sprite_Scale * S
+    for bomb in bomb_List:
+        if(bomb.update(Map_O) == True):
+            tiles = Map_O.tile_At(bomb.get_Collision_Coners())
+            for tile in tiles:
+                tile["Bomb"] = False
+            for explotion in bomb.explotion_List:
+                explotion_List.remove(explotion)
+                bomb.explotion_List.remove(explotion)
+            bomb.owner.bomb_List.remove(bomb)
+            bomb_List.remove(bomb)
+        if(len(bomb.explotion_List) > 0):
+            explotion_List.add(bomb.explotion_List)
+    # find all bushes that need to be desroyed
+    for explotion in explotion_List:
+        for bush in explotion.bushes_to_Destroyed:
+            bushes_to_Destroyed.append(bush)
+            explotion.bushes_to_Destroyed = []
+    # if there is a bush to destroy find it then remove it form the game
+    if(len(bushes_to_Destroyed) > 0):
+        for bush in bush_List:
+            for bush_Destroy in bushes_to_Destroyed:
+                if(bush.Position() == bush_Destroy):
+                    bush_List.remove(bush)
+    # --- Check win condition
+    if(len(man_List) == 6):
+        for man in man_List:
+            done = True
 
-            # --- Screen-clearing code goes here
-
-            # Here, we clear the screen to white. Don't put other drawing commands
-            # above this, or they will be erased with this command.
-
-            # If you want a background image, replace this clear with blit'ing the
-            # background image.
-    screen.fill(BLACK)
+    # --- Screen-clearing code goes here
+    # Here, we clear the screen to white. Don't put other drawing commandsd
+    # above this, or they will be erased with this command.
+    # If you want a background image, replace this clear with blit'ing the
+    # background image.
     # --- Drawing code should go here
-    if(bDrwan == False):
-        background_List.draw(screen)
-        wall_List.draw(screen)
-        bush_List.draw(screen)
-        bomb_List.draw(screen)
-        bDrawn = True
+    background_List.draw(screen)
+    wall_List.draw(screen)
+    bomb_List.draw(screen)
+    bush_List.draw(screen)
+    explotion_List.draw(screen)
     man_List.draw(screen)
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second
     clock.tick(60)
-    if(clock.get_fps() > 20):
-        print ("fps:" + str(clock.get_fps()))
 
 # Close the window and quit.
 pygame.quit()
