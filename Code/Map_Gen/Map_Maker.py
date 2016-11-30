@@ -4,6 +4,8 @@ from os import path
 
 import random
 from random import randrange
+
+from Map_Object import o_Map
 # setup to improt files fomr MyLib
 path = os.path.realpath(__file__)
 for i in range(0, 2):
@@ -27,6 +29,8 @@ from Pillar import Sprite_Pillar
 from Bush import Sprite_Bush
 from Spawn import Sprite_Spawn
 from Brick import Sprite_Brick
+
+grass_Percent = 60
 
 
 def Map_Load(screen_Size, x_Size=42):
@@ -53,15 +57,15 @@ def Map_Load(screen_Size, x_Size=42):
     wall_List = pygame.sprite.Group()
     # Read each line of the map
     with open(path_Maps, "r") as f:
-        lines = f.readlines()
+        map_String = f.readlines()
         f.close
 
     x_Offset = (screen_Size[0] - (map_Info[0] * map_Info[1][0])) / 2
     y = 0
     x = x_Offset
 
-    for line in lines:
-        for character in line:
+    for row in map_String:
+        for character in row:
             if (character == 'w'):
                 sprite = wall_Factory.New((x, y), True, map_Info[0])
             elif(character == 'g'):
@@ -90,8 +94,10 @@ def Map_Load(screen_Size, x_Size=42):
             x += map_Info[0]
         x = x_Offset
         y += map_Info[0]
+
+    map_Object = o_Map(map_String, map_Info[0], x_Offset)
     # return the populated background_List
-    return [background_List, bush_List, wall_List, map_Info[0]]
+    return [background_List, bush_List, wall_List, map_Info[0], map_Object]
 
 
 def Map_Gen(screen_Size=None, file_Path=None, x_Size=42):
@@ -148,7 +154,7 @@ def Map_Maker(x_End, y_End, f):
             if((y == 0 or y == y_End - 1 or x == 0 or x == x_End - 1) or (y % 2 == 0 and x % 2 == 0)):
                 line.append("w")
             else:
-                if(random.randint(0, 100) <= 60):
+                if(random.randint(0, 100) <= grass_Percent):
                     line.append("g")
                 else:
                     line.append("b")
