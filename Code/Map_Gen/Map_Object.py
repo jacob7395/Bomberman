@@ -12,6 +12,7 @@ class o_Map:
         self.map_Grid = [""] * len(grid[0])
         self.scale = size
         self.map_String = ""
+        self.bush_List = []
         for row in grid:
             self.map_String += row
 
@@ -25,6 +26,8 @@ class o_Map:
                     break
                 # fill the map grid with the respective properties
                 self.map_Grid[x].append({"Tile": character, "Position": (size * x, size * y), "Movable": self.tile_Dic[character], "C_Aare": (size, size), "Bomb": False, "Bomb_Object": None})
+                if(character == 'b'):
+                    self.bush_List.append(self.map_Grid[x])
                 x += 1
             y += 1
 
