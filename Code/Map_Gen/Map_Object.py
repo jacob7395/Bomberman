@@ -32,26 +32,35 @@ class o_Map:
             y += 1
 
     def __str__(self):
+        # map string to be retuned
         map_String = ""
-        for y in range(len(self.map_Grid[0]) - 1):
+        # run through each tile row by row then add the tile the the string
+        for y in range(len(self.map_Grid[0])):
             for x in range(len(self.map_Grid) - 1):
                 map_String += self.map_Grid[x][y]["Tile"]
+            # return charater need to be added after each row
             map_String += '\n'
         return map_String
 
     def tile_At(self, position):
+        """Find what tiles are at the passed position/positions"""
         # check position has been passed
         if(position == None):
             return None
+        # a list used to store each tile
         l = []
+        # run through each tile
         for pos in position:
+            # try to get the desired tile if it fails add 0,0 normaly a wall
             try:
+                # the tile is found by deviding the x,y posiotn by the scale of the map
                 l.append(self.map_Grid[int(pos[0]) // self.scale][int(pos[1]) // self.scale])
             except:
                 l.append(self.map_Grid[0][0])
         return l
 
     def get_Movable(self, tiles):
+        """checks if the passed tiles are movable then return is any are not"""
         for tile in tiles:
             if(tile["Movable"] == False):
                 return False
@@ -75,3 +84,19 @@ class o_Map:
             tile[x] = tile[x].replace("\n", "")
             tile[x] = tile[x].split("=")
             self.tile_Dic.update({tile[x][0]: bool(int(tile[x][1]))})
+
+    def get_Tiles(self, tile_Character):
+        # List for tiles to be stored in
+        tiels = []
+        # check the passed value is valid
+        if(type(tile_Character) != str):
+            return None
+        # run through every tile in the map
+        for row in self.map_Grid:
+            for tile in row:
+                # check if the tile is a desite tile then add to list
+                # if a retun character is passed to the function all tils will be retuned
+                if(tile["Tile"] == tile_Character or tile_Character == '\n'):
+                    tiels.append(tile)
+
+        return tiels
