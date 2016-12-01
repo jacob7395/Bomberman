@@ -77,10 +77,8 @@ sprite_Scale = sprite_Lists[3]
 Map_O = sprite_Lists[4]
 
 
-for rows in Map_O.map_Grid:
-    for tile in rows:
-        if(tile['Tile'] == 'b'):
-            print(tile)
+for bush in Map_O.bush_List:
+    print(bush)
 # bomb group and factry init
 bomb_List = pygame.sprite.Group()
 explotion_List = pygame.sprite.Group()
