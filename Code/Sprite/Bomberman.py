@@ -30,7 +30,11 @@ from Bomb import Sprite_Bomb
 class Sprite_Bomberman(Player):
     """Test fucntion for sprite init."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, sprite_Man=0):
+    def __init__(self,
+                 spawn_Area=(0, 0, 0, 0),
+                 fixed=False,
+                 sprite_Scale=None,
+                 sprite_Man=0):
         """Class init."""
 
         self.index = 0
@@ -109,19 +113,20 @@ class Sprite_Bomberman(Player):
         self.index = 0
         self.Set_Image(self.current_Image_Name)
 
-    def update_Positions(self, dt, map_Object):
+    def update_Positions(self,
+                         dt,
+                         map_Object):
         on_Bomb = self.check_Bomb(map_Object, self.get_Collision_Coners())
         if(on_Bomb == False and self.bomb_Movable == True):
             self.bomb_Movable = False
 
-        move = self.check_Move(
-            (self.velocity_x * dt, self.velocity_y * dt), map_Object)
+        move = self.check_Move((self.velocity_x * dt, self.velocity_y * dt), map_Object)
         if(move[0] == True and (move[1] == False or self.bomb_Movable == True)):
             self.Incroment_Position(
                 (self.velocity_x * dt, self.velocity_y * dt))
         else:
             if(type(move[1]) != bool):
-                if(move[1][1].bomberman.ID == self.ID):
+                if(move[1][1].owner.ID == self.ID):
                     move[1][1].acceleration = self.bomb_Kick_Power / self.bomb_Slow_Rate
                     if(self.current_Image_Name == "DOWN"):
                         move[1][1].Velocity(0, self.bomb_Kick_Power)
@@ -138,7 +143,8 @@ class Sprite_Bomberman(Player):
                     move[1][1].t_Old = time.clock()
             self.stop_running()
 
-    def spawn_Bomb(self, map_Object):
+    def spawn_Bomb(self,
+                   map_Object):
         if(self.bomb_Count > 0 and map_Object.tile_At([self.get_Sprite_Center()])[0]["Bomb"] == False):
             pos = self.get_Sprite_Center()
             bomb = self.bomb_Factory.New(map_Object.tile_At([pos])[0]["Position"], False, self.scale, self.bomb_Fuse_Time, self.bomb_Explotion_Size)
@@ -155,7 +161,8 @@ class Sprite_Bomberman(Player):
             self.bomb_Next_Replenishment = time.clock() + self.bomb_Replenish_Rate
             self.bomb_Start_Replenishment = True
 
-    def update(self, map_Object):
+    def update(self,
+               map_Object):
         t = time.clock()
         dt = t - self.oldt
         if(self.running == True):

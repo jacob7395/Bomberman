@@ -125,7 +125,10 @@ class Sprite_Two_Dimensions(pygame.sprite.Sprite):
         image.blit(self.sheet, (0, 0), rect)
         # Scale the image if the sacle property exitst
         if(sprite_Scale != None):
-            image = pygame.transform.scale(image, (sprite_Scale, sprite_Scale))
+            if(type(sprite_Scale == int)):
+                image = pygame.transform.scale(image, (sprite_Scale, sprite_Scale))
+            else:
+                image = pygame.transform.scale(image, (sprite_Scale[0], sprite_Scale[1]))
         # Flip the sprite if the property exitst
         if(sprite_Flip != None):
             image = pygame.transform.flip(

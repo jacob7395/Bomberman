@@ -28,20 +28,16 @@ class Sprite_Explotion(Player):
 
     def __init__(self,
                  spawn_Area=(0, 0, 0, 0),
-                 asset_List,
+                 asset_List=None,
                  fixed=False,
                  sprite_Scale=None,
                  map_Object=None,
-                 direction=None,
                  bomb=None,
+                 explotion_Groth_Rate=0.1,
                  explotion_Grown=False,
-                 explotion_Size=None,
-                 explotion_Base=None,
-                 explotion_Groth_Rate=None
-                 ):
+                 explotion_Size=None):
         """Class init."""
         # bomb propertys
-        self.current_Image_Name = None
         self.collition_Offset = 2
         self.scale = sprite_Scale
         self.bomb = bomb
@@ -53,7 +49,7 @@ class Sprite_Explotion(Player):
         self.bushes_to_Destroyed = []
 
         # Call the parent class (Sprite) constructor
-        super(Sprite_Explotion_Arm, self).__init__(spawn_Area, fixed, asset_List, sprite_Scale)
+        super(Sprite_Explotion, self).__init__(spawn_Area, fixed, asset_List, sprite_Scale)
 
 
 class Sprite_Explotion_Arm(Sprite_Explotion):
@@ -69,19 +65,12 @@ class Sprite_Explotion_Arm(Sprite_Explotion):
                  explotion_Groth_Rate=None,
                  explotion_Size=None):
         """Class init."""
-        self.scale = sprite_Scale
-        self.bomb = bomb
         # explotion props
         self.explotion_Base = explotion_Base
-        self.explotion_Grown = False
-        self.explotion_Size = explotion_Size
-        self.explotion_Groth_Rate = explotion_Groth_Rate
-        self.explotion_Change_Time = time.clock() + self.explotion_Groth_Rate
         self.direction = direction
-        self.bushes_to_Destroyed = []
         # determin what direction the explotion is traveling and if an end is needed
         if(direction[0] != 0):
-            if(self.explotion_Size == 0):
+            if(explotion_Size == 0):
                 if(self.direction == (1, 0)):
                     self.current_Image_Name = "explotion_Vertical_End_Fliped"
                 else:
@@ -89,7 +78,7 @@ class Sprite_Explotion_Arm(Sprite_Explotion):
             else:
                 self.current_Image_Name = "explotion_Vertical"
         elif(direction[1] != 0):
-            if(self.explotion_Size == 0):
+            if(explotion_Size == 0):
                 if(self.direction == (0, -1)):
                     self.current_Image_Name = "explotion_Horizontal_End_Fliped"
                 else:
@@ -149,7 +138,15 @@ class Sprite_Explotion_Arm(Sprite_Explotion):
 
         asset_List = [explotion_Vertical, explotion_Vertical_End, explotion_Vertical_End_Filp, explotion_Horizontal, explotion_Horizontal_End, explotion_Horizontal_End_Fliped]
         # Call the parent class (Sprite) constructor
-        super(Sprite_Explotion_Arm, self).__init__(spawn_Area, fixed, asset_List, sprite_Scale)
+        super(Sprite_Explotion_Arm, self).__init__(spawn_Area,
+                                                   asset_List,
+                                                   fixed,
+                                                   sprite_Scale,
+                                                   map_Object,
+                                                   bomb,
+                                                   explotion_Groth_Rate,
+                                                   False,
+                                                   explotion_Size)
         # Chose the image initaly dispalyed
         self.Set_Image(self.current_Image_Name)
         # Check what bushes the explotions collide with
@@ -177,10 +174,17 @@ class Sprite_Explotion_Arm(Sprite_Explotion):
                             self.explotion_Base.explotion_Arm_List.add(explotion_Arm)
 
 
-class Sprite_Explotion_Base(Player):
+class Sprite_Explotion_Base(Sprite_Explotion):
     """Test fucntion for sprite init."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, map_Object=None, explotion_Size=2, bomb=None):
+    def __init__(self,
+                 spawn_Area=(0, 0, 0, 0),
+                 fixed=False,
+                 sprite_Scale=None,
+                 map_Object=None,
+                 explotion_Size=2,
+                 bomb=None,
+                 explotion_Groth_Rate=0.01):
         """Class init."""
         # bomb propertys
         self.current_Image_Name = "explotion"
@@ -192,10 +196,8 @@ class Sprite_Explotion_Base(Player):
         self.explotion_Arm_Factory = Class_Factory("Explotion_Arm", Sprite_Explotion_Arm)
         self.explotion_Grown = True
         self.explotion_Growing = True
-        self.explotion_Size = explotion_Size
-        self.explotion_Groth_Rate = 0.01
         self.explotion_Timeout = 0.25
-        self.explotion_Change_Time = time.clock() + self.explotion_Groth_Rate
+        self.explotion_Change_Time = time.clock() + explotion_Groth_Rate
         self.bushes_to_Destroyed = []
 
         explotion = {}
@@ -209,7 +211,15 @@ class Sprite_Explotion_Base(Player):
         asset_List = [explotion]
 
         # Call the parent class (Sprite) constructor
-        super(Sprite_Explotion_Base, self).__init__(spawn_Area, fixed, asset_List, sprite_Scale)
+        super(Sprite_Explotion_Base, self).__init__(spawn_Area,
+                                                    asset_List,
+                                                    fixed,
+                                                    sprite_Scale,
+                                                    map_Object,
+                                                    bomb,
+                                                    explotion_Groth_Rate,
+                                                    True,
+                                                    explotion_Size)
         # Chose the image initaly dispalyed
         self.Set_Image(self.current_Image_Name)
 
@@ -237,7 +247,15 @@ class Sprite_Explotion_Base(Player):
                 for tile in tiles:
                     if(tile[0]["Tile"] != 'w'):
                         arm_Pos = (pos[0] + (tile[1][0] * self.scale) - self.scale / 2, pos[1] + (tile[1][1] * self.scale) - self.scale / 2)
-                        explotion_Arm = self.explotion_Arm_Factory.New(arm_Pos, False, self.scale, map_Object, tile[1], self.bomb, self, self.explotion_Groth_Rate, self.explotion_Size)
+                        explotion_Arm = self.explotion_Arm_Factory.New(arm_Pos,
+                                                                       False,
+                                                                       self.scale,
+                                                                       map_Object,
+                                                                       tile[1],
+                                                                       self.bomb,
+                                                                       self,
+                                                                       self.explotion_Groth_Rate,
+                                                                       self.explotion_Size)
                         self.bomb.explotion_List.add(explotion_Arm)
                         self.explotion_Arm_List.add(explotion_Arm)
 

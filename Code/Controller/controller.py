@@ -1,11 +1,13 @@
 import time
 import pygame
+import platform
 from pygame import joystick
 
 
 class controller_Object:
 
     def __init__(self, bomberman=None, controller_ID=None):
+        self.system = platform.system()
         self.bomberman = bomberman
         self.controller_ID = controller_ID
         self.player = joystick.Joystick(self.controller_ID)
@@ -18,12 +20,29 @@ class controller_Object:
     def EventManager(self):
         pygame.event.pump()
         # update the button states
-        self.states = {
-            'A': self.player.get_button(11),
-            'UP': self.player.get_button(0),
-            'DOWN': self.player.get_button(1),
-            'LEFT': self.player.get_button(2),
-            'RIGHT': self.player.get_button(3)}  # return true or false of buttons
+        if(self.system == "Linix"):
+            self.states = {
+                'A': self.player.get_button(11),
+                'UP': self.player.get_button(0),
+                'DOWN': self.player.get_button(1),
+                'LEFT': self.player.get_button(2),
+                'RIGHT': self.player.get_button(3)}  # return true or false of buttons
+        elif(self.system == "Windows"):
+            self.states = {
+                'A': self.player.get_button(0)}
+            hat_Values = self.player.get_hat(0)
+
+            self.states.update({'RIGHT': 0, 'LEFT': 0, 'UP': 0, 'DOWN': 0})
+
+            if(hat_Values[0] == 1):
+                self.states.update({'RIGHT': 1, 'LEFT': 0})
+            elif(hat_Values[0] == -1):
+                self.states.update({'RIGHT': 0, 'LEFT': 1})
+
+            if(hat_Values[1] == 1):
+                self.states.update({'UP': 1, 'DOWN': 0})
+            elif(hat_Values[1] == -1):
+                self.states.update({'UP': 0, 'DOWN': 1})
 
         for directon in self.directions:
             if(self.states[directon] == True):

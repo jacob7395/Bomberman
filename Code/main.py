@@ -40,14 +40,6 @@ from Bomberman import Sprite_Bomberman
 sys.path.insert(0, path_Map_Gen)
 # import test sprite
 from Map_Maker import Map_Load
-
-
-def sign(x):
-    if (x <= 0):
-        return 1
-    else:
-        return -1
-
 # -----------------------------------------------
 # Reset error file
 Make_Error_File()

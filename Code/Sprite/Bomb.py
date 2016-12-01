@@ -28,7 +28,8 @@ from Explotion import Sprite_Explotion_Base
 class Sprite_Bomb(Player):
     """Bomb class controlls as varibles."""
 
-    def __init__(self, spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, fuse_Time=1, explotion_Size=2, bomberman=None):
+    def __init__(self,
+                 spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, fuse_Time=1, explotion_Size=2, bomberman=None):
         """Class init."""
         # bomb propertys
         self.current_Image_Name = "bomb"

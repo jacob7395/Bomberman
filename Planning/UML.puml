@@ -22,7 +22,10 @@ package Sprite_Gen{
     ==
     Funtions
     --
-    - __inti__(spawn_area, spawn_Area=(0, 0), fixed=False, asset_List=[])
+    - __inti__(spawn_area,
+                spawn_Area=(0, 0),
+                fixed=False,
+                asset_List=[])
     # Functions to send or resive velocirt or position_x
     # if nothing is sent the values will be unchanged
     + Position(*pos = (x,y)) : (x,y)
@@ -53,7 +56,10 @@ package Sprite_Gen{
     ==
     Funtions
     --
-    - __inti__(spawn_Area=(0, 0), fixed=False, asset_List=[], sprite_Scale=16)
+    - __inti__(spawn_Area=(0, 0),
+                fixed=False,
+                asset_List=[],
+                sprite_Scale=16)
     + check_Neighbor_Tiles(map_Object)
     + position_In_Collition(pos)
     + check_Move(move,map_Object)
@@ -93,7 +99,10 @@ package Sprite_Gen{
     ==
     Funtions
     --
-    - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False, sprite_Scale=None, sprite_Man=0)
+    - __inti__(spawn_Area=(0, 0, 0, 0),
+                fixed=False,
+                sprite_Scale=None,
+                sprite_Man=0)
     + begin_running()
     + stop_running()
     + update_Positions()
@@ -113,7 +122,7 @@ package Sprite_Gen{
       + t_Old = time.clock()
       + collition_Offset = 5
       + decceleration = 1
-      + v_Start =  = (0, 0)
+      + v_Start = (0, 0)
       + bomb_Countdown = True
       + bomberman = bomberman
       #Timer varibles
@@ -142,9 +151,11 @@ package Sprite_Gen{
       ==
       Funtions
       --
-      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
-                  sprite_Scale=None, sprite_Man=0,
-                    bomberman = None)
+      - __inti__(spawn_Area=(0, 0, 0, 0),
+                  fixed=False,
+                  sprite_Scale=None,
+                  sprite_Man=0,
+                  bomberman = None)
       + update_Positions()
       + spawn_Explotion(map_Object)
       + update(map_Object)
@@ -161,12 +172,17 @@ package Sprite_Gen{
       + explotion_Growing = True
       + explotion_Groth_Rate = 0.01
       + explotion_Timeout = 0.25
+      + self.current_Image_Name = None
       ==
       Funtions
       --
-      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
-                  sprite_Scale=None, map_Object=None,
-                    explotion_Size=2, bomb=None)
+      - __inti__(spawn_Area=(0, 0, 0, 0),
+                  fixed=False,
+                  sprite_Scale=None,
+                  map_Object=None,
+                  explotion_Size=2,
+                  bomb=None,
+                  explotion_Groth_Rate=0.01)
       + update(map_Object)
     }
 
@@ -176,15 +192,21 @@ package Sprite_Gen{
       Vars
       --
       # explotion arm props
+      + current_Image_Name = None
       + explotion_Base = explotion_Base
       + direction = direction
       ==
       Funtions
       --
-      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
-                  sprite_Scale=None, map_Object=None,
-                    direction=None, bomb=None, explotion_Base=None,
-                      explotion_Groth_Rate=None, explotion_Size=None)
+      - __inti__(spawn_Area=(0, 0, 0, 0),
+                  fixed=False,
+                  sprite_Scale=None,
+                  map_Object=None,
+                  direction=None,
+                  bomb=None,
+                  explotion_Base=None,
+                  explotion_Groth_Rate=None,
+                  explotion_Size=None)
       + update(map_Object)
     }
 
@@ -193,8 +215,6 @@ package Sprite_Gen{
       ==
       Vars
       --
-      # bomb propertys
-      self.current_Image_Name = None
       # bomb props
       + collition_Offset = 2
       + scale = sprite_Scale
@@ -206,13 +226,18 @@ package Sprite_Gen{
       + explotion_Groth_Rate = explotion_Groth_Rate
       + explotion_Change_Time = time.clock() + self.explotion_Groth_Rate
       + direction = direction
-      + bushes_to_Destroyed = []
       ==
       Funtions
       --
-      - __inti__(spawn_Area=(0, 0, 0, 0), fixed=False,
-                  sprite_Scale=None, map_Object=None,
-                    explotion_Size=2,bomb = None)
+      - __inti__(spawn_Area=(0, 0, 0, 0),
+                 asset_List=None,
+                 fixed=False,
+                 sprite_Scale=None,
+                 map_Object=None,
+                 bomb=None,
+                 explotion_Groth_Rate=0.1,
+                 explotion_Grown=False,
+                 explotion_Size=None)
     }
   }
 
