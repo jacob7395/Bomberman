@@ -112,14 +112,16 @@ controllers = []
 for count in range(joystick.get_count()):
     for bomberman in man_List:
         if(bomberman.ID - 1 == count):
-            bomberman.AI = True
-            bot_Count -= 1
+            bomberman.AI = False
             controllers.append(controller_Object(bomberman, count))
 
-botList = list()
-for x in range(bot_Count + 1):
-    botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
-    botList[x].setList(Map_O.map_Grid)
+botList = [""] * (len(man_List) + 1)
+for man in man_List:
+    if(man.AI == True):
+        botList[man.ID] = (AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+        botList[man.ID].setList(Map_O.map_Grid)
+    else:
+        botList.append([])
 
 done = False
 # used to manage how fast the screen updates
@@ -127,19 +129,9 @@ clock = pygame.time.Clock()
 oldrects = pygame.Rect(10, 10, 10, 10)
 
 for man in man_List:
-    # get a list of all men withouth me in it
-    man_List_Not_Me = []
-    for not_Me in man_List:
-        if(not_Me.ID != man.ID):
-            man_List_Not_Me.append(not_Me)
-    target = random.choice(man_List_Not_Me)
-    # gets the tiles posion on the map object for the mans location
-    pos = (Map_O.pos_To_Location([man.get_Sprite_Center()]))[0]
-    tagert_Pos = (Map_O.pos_To_Location([target.get_Sprite_Center()]))[0]
-    # get path with dicstra
-    path = botList[man.ID].pathFinding.getPath(pos, tagert_Pos, Map_O.map_Grid)
-    print("Target Pos = {},Current Pos = {},Target path = {}".format(tagert_Pos, pos, path))
-    botList[man.ID].getPath(pos, Map_O.map_Grid)
+    # get a path to the target
+    if(man.AI == True):
+        botList[man.ID].findMan(man, man_List, Map_O)
 
 startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
 endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
@@ -236,14 +228,13 @@ while not done:
 
             direction = botList[man.ID].update(screen, Map_O, man)
 
+            if(botList[man.ID].path == None):
+                botList[man.ID].path = botList[man.ID].pathFinding.getPath(pos, (1, 1), Map_O.map_Grid)
+
             if direction != None:
                 if direction == "BOOM":
                     man.spawn_Bomb(Map_O)
                     continue
-                elif direction == "NewTarget":
-                    pass
-                    # pos = man.Position()
-                    # botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
                 else:
                     man.changeDirection(direction)
                     if(man.running == False):
@@ -303,6 +294,6 @@ while not done:
     pygame.display.flip()
     # --- Limit to 60 frames per second
     clock.tick(60)
-    # pygame.time.delay(100)
+    pygame.time.delay(100)
 # Close the window and quit.
 pygame.quit()

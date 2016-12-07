@@ -27,7 +27,7 @@ class Dijkstra:
         self.dynamicTiles = mapTiles
 
         while (True):
-            if steps > 100:
+            if steps > 1000:
                 return
 
             if self.closed[playerPosition[0]][playerPosition[1]] == True:
@@ -46,22 +46,22 @@ class Dijkstra:
                         self.currentLowest = self.cost[i][j]
             self.closed[self.lowestI][self.lowestJ] = True
             #print(mapTiles[self.lowestI] [self.lowestJ - 1])
-            if self.isValid(self.lowestI, self.lowestJ - 1) == True and mapTiles[self.lowestI][self.lowestJ - 1].get("Tile") is not 'w' and mapTiles[self.lowestI][self.lowestJ - 1].get("Tile") is not 'b':
+            if self.isValid(self.lowestI, self.lowestJ - 1) == True and mapTiles[self.lowestI][self.lowestJ - 1].get("Tile") is not 'w':
                 if self.cost[self.lowestI][self.lowestJ] < self.cost[self.lowestI][self.lowestJ - 1]:
                     self.cost[self.lowestI][self.lowestJ - 1] = self.cost[self.lowestI][self.lowestJ] + 1
                     self.link[self.lowestI][self.lowestJ - 1] = [self.lowestI, self.lowestJ]
 
-            if self.isValid(self.lowestI + 1, self.lowestJ) == True and mapTiles[self.lowestI + 1][self.lowestJ].get("Tile") is not 'w' and mapTiles[self.lowestI + 1][self.lowestJ].get("Tile") is not 'b':
+            if self.isValid(self.lowestI + 1, self.lowestJ) == True and mapTiles[self.lowestI + 1][self.lowestJ].get("Tile") is not 'w':
                 if self.cost[self.lowestI][self.lowestJ] < self.cost[self.lowestI + 1][self.lowestJ]:
                     self.cost[self.lowestI + 1][self.lowestJ] = self.cost[self.lowestI][self.lowestJ] + 1
                     self.link[self.lowestI + 1][self.lowestJ] = [self.lowestI, self.lowestJ]
 
-            if self.isValid(self.lowestI, self.lowestJ + 1) == True and mapTiles[self.lowestI][self.lowestJ + 1].get("Tile") is not 'w' and mapTiles[self.lowestI][self.lowestJ + 1].get("Tile") is not 'b':
+            if self.isValid(self.lowestI, self.lowestJ + 1) == True and mapTiles[self.lowestI][self.lowestJ + 1].get("Tile") is not 'w':
                 if self.cost[self.lowestI][self.lowestJ] < self.cost[self.lowestI][self.lowestJ + 1]:
                     self.cost[self.lowestI][self.lowestJ + 1] = self.cost[self.lowestI][self.lowestJ] + 1
                     self.link[self.lowestI][self.lowestJ + 1] = [self.lowestI, self.lowestJ]
 
-            if self.isValid(self.lowestI - 1, self.lowestJ) == True and mapTiles[self.lowestI - 1][self.lowestJ].get("Tile") is not 'w' and mapTiles[self.lowestI - 1][self.lowestJ].get("Tile") is not 'b':
+            if self.isValid(self.lowestI - 1, self.lowestJ) == True and mapTiles[self.lowestI - 1][self.lowestJ].get("Tile") is not 'w':
                 if self.cost[self.lowestI][self.lowestJ] < self.cost[self.lowestI - 1][self.lowestJ]:
                     self.cost[self.lowestI - 1][self.lowestJ] = self.cost[self.lowestI][self.lowestJ] + 1
                     self.link[self.lowestI - 1][self.lowestJ] = [self.lowestI, self.lowestJ]
@@ -79,10 +79,16 @@ class Dijkstra:
             stepCount += 1
             if nextClosed == botPosition:
                 break
-        steps.append(True)
 
-        print("Got a Path")
-        return steps
+        possible_Path = []
+        for pos in steps:
+            if(mapTiles[pos[0]][pos[1]]["Tile"] != 'b'):
+                possible_Path.append(pos)
+            else:
+                break
+
+        possible_Path.append(True)
+        return possible_Path
 
     def getPathSecond(self, playerPosition, botPosition, mapTiles):
         self.initializeVariables()

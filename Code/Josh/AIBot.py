@@ -11,6 +11,7 @@ class AIBot:
         self.runAwayPath = None
         self.reset()
         self.moving_Pos = None
+        self.back_Path = []
 
     def isSeeking(self):
         return self.hasPath
@@ -21,25 +22,20 @@ class AIBot:
         self.currentMoveRun = 0
         self.currentMoveRun = 0
 
-    def getPath(self, currentPosition, map):
-        self.map = map
-        if self.hasPath == False:
-            for i, row in enumerate(map):
-                for j, tile in enumerate(row):
-                    if(tile['Tile'] == 'b'):
-                        position = tile.get("Position")
-                        curPos = (position[0] / 34, position[1] / 34)
-                        self.path = self.pathFinding.getPath(currentPosition, [curPos[0], curPos[1]], map)
-                        if self.path is not None:
-                            print(self.path)
-                            self.movements = int(len(self.path))
-                            self.currentMove = 0
-                            self.isSeeking = True
-                            self.hasPath = True
-                            return self.path
-                        continue
-            print("No possible moves")
-            return None
+    def findMan(self, me_Man, man_List, map):
+        man = me_Man
+        # get a list of all men withouth me in it
+        man_List_Not_Me = []
+        for not_Me in man_List:
+            if(not_Me.ID != man.ID):
+                man_List_Not_Me.append(not_Me)
+        target = random.choice(man_List_Not_Me)
+        # gets the tiles posion on the map object for the mans location
+        pos = (map.pos_To_Location([man.get_Sprite_Center()]))[0]
+        tagert_Pos = (map.pos_To_Location([target.get_Sprite_Center()]))[0]
+        # get path with dicstra
+        path = self.pathFinding.getPath(pos, tagert_Pos, map.map_Grid)
+        self.path = path
 
     def setList(self, lst):
         self.map = lst
@@ -114,16 +110,20 @@ class AIBot:
 
     def update(self, display, map_Object, bomberman):
         if self.path is not None:
+            if(bomberman.ID == 1):
+                print(self.path)
             currentPosition = self.moving_Pos
             if(currentPosition == self.path[0]):
-                self.path.remove(currentPosition)
+                self.back_Path.append(self.path.pop(0))
 
             if(type(self.path[0]) == bool):
                 if(self.path[0] == True):
-                    self.path = None
+                    self.path = []
+                    for x in range(0, 2):
+                        self.path.append(self.back_Path[x])
+                    self.path.append(False)
                     return str("BOOM")
                 else:
-                    self.path = None
                     return None
 
             targetPosition = self.path[0]

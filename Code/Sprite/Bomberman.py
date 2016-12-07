@@ -61,6 +61,7 @@ class Sprite_Bomberman(Player):
         self.bomb_Replenish_Rate = 1
         self.bomb_Fuse_Time = 2
         self.bomb_Explotion_Size = 2
+        self.bombs_Out = 0
 
         man_Down = {}
         man_Down["s_Res"] = (16, 16)
@@ -169,8 +170,6 @@ class Sprite_Bomberman(Player):
         t = time.clock()
         dt = t - self.oldt
         if(self.running == True):
-            # print("Time = {}".format(t))
-            # print("DTime = {}".format(self.oldt))
             # update running animations
             self.incroment_Animation_Index(t)
             # if the movment is grater then 1 pixle update movments
@@ -194,4 +193,5 @@ class Sprite_Bomberman(Player):
         if (t > self.bomb_Next_Replenishment and self.bomb_Start_Replenishment == True):
             self.bomb_Count += 1
             self.bomb_Start_Replenishment = False
+
         return self.bomb_List
