@@ -59,6 +59,24 @@ class o_Map:
                 l.append(self.map_Grid[0][0])
         return l
 
+    def pos_To_Location(self, position):
+        # check position has been passed
+        if(position == None):
+            return None
+        # print("Pos = {}".format(position))
+        # a list used to store each tile
+        l = []
+        # run through each tile
+        for pos in position:
+            # try to get the desired tile if it fails add 0,0 normaly a wall
+            try:
+                # the tile is found by deviding the x,y posiotn by the scale of the map
+                l.append([int(pos[0]) // self.scale, int(pos[1]) // self.scale])
+            except:
+                l.append([0, 0])
+        # print("list = {}".format(l))
+        return l
+
     def get_Movable(self, tiles):
         """checks if the passed tiles are movable then return is any are not"""
         for tile in tiles:

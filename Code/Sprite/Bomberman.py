@@ -113,7 +113,7 @@ class Sprite_Bomberman(Player):
         self.index = 0
         self.Set_Image(self.current_Image_Name)
 
-    def changeDirection(self, direction) :
+    def changeDirection(self, direction):
         self.current_Image_Name = direction
 
     def update_Positions(self,
@@ -169,6 +169,8 @@ class Sprite_Bomberman(Player):
         t = time.clock()
         dt = t - self.oldt
         if(self.running == True):
+            # print("Time = {}".format(t))
+            # print("DTime = {}".format(self.oldt))
             # update running animations
             self.incroment_Animation_Index(t)
             # if the movment is grater then 1 pixle update movments
