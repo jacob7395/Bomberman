@@ -113,9 +113,6 @@ class Sprite_Bomberman(Player):
         self.index = 0
         self.Set_Image(self.current_Image_Name)
 
-    def changeDirection(self, direction) :
-        self.current_Image_Name = direction
-
     def update_Positions(self,
                          dt,
                          map_Object):

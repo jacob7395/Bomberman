@@ -21,10 +21,10 @@ class Button:
         return self.rect
 
     def textAlignmentLeft(self) :
-        self.textPos = self.textPos = [self.x, self.y + (self.height / 4)]
+        self.textPos = self.textPos = [self.x + self.width / 4, self.y + (self.height / 4)]
 
     def update(self, display) :
-       # print("test")
         pygame.draw.rect(display, self.buttonColour, self.rect);
         text = self.gameFont.render(self.text, True, self.textColour);
         display.blit(text, self.textPos, None);
+
