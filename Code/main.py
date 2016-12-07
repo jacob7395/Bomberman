@@ -6,7 +6,7 @@ import time
 import threading
 from multiprocessing.pool import ThreadPool
 from multiprocessing import Process, Queue
-
+import time
 import pygame
 from pygame import draw, display, rect, mouse, joystick
 from pygame.sprite import groupcollide
@@ -17,6 +17,7 @@ for i in range(0, 1):
 # File path for custom liberys
 path_JacobLib = path + "/JacobLib"
 path_Sprite = path + "/Sprite"
+path_Josh = path + "/Josh"
 controller_Sprite = path + "/controller"
 path_Assets = os.path.dirname(path) + "/Assets/"
 path_Map_Gen = os.path.dirname(path) + "/Code" + "/Map_Gen"
@@ -36,6 +37,12 @@ sys.path.insert(0, path_Sprite)
 from Bomb import Sprite_Bomb
 # import bomberman sprite
 from Bomberman import Sprite_Bomberman
+
+sys.path.insert(0, path_Josh)
+import AIBot
+import StartMenu
+import GameEnd
+
 
 sys.path.insert(0, path_Map_Gen)
 # import test sprite
@@ -77,14 +84,30 @@ sprite_Scale = sprite_Lists[3]
 Map_O = sprite_Lists[4]
 
 
-for bush in Map_O.bush_List:
-    print(bush)
+botList = list()
+botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+botList.append(AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+
+botList[0].setList(Map_O.map_Grid)
+botList[1].setList(Map_O.map_Grid)
+botList[2].setList(Map_O.map_Grid)
+botList[3].setList(Map_O.map_Grid)
+botList[4].setList(Map_O.map_Grid)
+#bot = AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1))
+# bot.setList(Map_O.map_Grid)
+
+
+# for bush in Map_O.bush_List:
+# print(bush)
 # bomb group and factry init
 bomb_List = pygame.sprite.Group()
 explotion_List = pygame.sprite.Group()
 # make bomber man
 # get number of plugged in controllers
-number_Of_Players = joystick.get_count()
+number_Of_Players = 4
 man_List = pygame.sprite.Group()
 man_Factory = Class_Factory("Man", Sprite_Bomberman)
 man_Count = 0
@@ -104,6 +127,66 @@ done = False
 # used to manage how fast the screen updates
 clock = pygame.time.Clock()
 oldrects = pygame.Rect(10, 10, 10, 10)
+
+for man in man_List:
+    pos = man.Position()
+    botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
+
+startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
+endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
+
+pygame.mixer.music.load(path_Assets + "StartScreen.wav")
+pygame.mixer.music.play(-1, 0.0)
+
+
+start = True
+while start:
+    screen.fill(BLACK)
+    startMenu.controllers(pygame.joystick.get_count())
+    startMenu.update(screen)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            start = False
+            break
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            if startMenu.state == 0:
+                keyPress = startMenu.keyPress(pos)
+                if keyPress == "playButton":
+                    startMenu.state = 1
+                elif keyPress == "exitButton":
+                    pygame.quit()
+                    # Need to make this exit the program properly
+            elif startMenu.state == 1:
+                keyPress = startMenu.keyPress(pos)
+                if keyPress == "confirmButton":
+                    start = False
+                elif keyPress == "backButton":
+                    startMenu.state = 0
+    pygame.display.flip()
+
+
+pygame.mixer.music.stop()
+# pygame.mixer.music.load(path_Assets + "Battle.mp3")
+# pygame.mixer.music.play(-1,0.0)
+
+
+gameOver = False
+while gameOver == True:
+    screen.fill(BLACK)
+    endScreen.update(screen)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            start = False
+            break
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            keyPress = endScreen.keyPress(pos)
+            if keyPress == "mainMenuButton":
+                print("Go back to the main menu")
+    pygame.display.flip()
+
+
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -167,16 +250,37 @@ while not done:
     # If you want a background image, replace this clear with blit'ing the
     # background image.
     # --- Drawing code should go here
+
     background_List.draw(screen)
     wall_List.draw(screen)
+    explotion_List.draw(screen)
+
+    for man in man_List:
+        if man.ID > 1:
+         #   pos = man.Position()
+         #   botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
+            if botList[man.ID].isSeeking == True:
+                pos = man.Position()
+                update = botList[man.ID].update([pos[0] / 34, pos[1] / 34], screen)
+                if update is not "None" or None:
+                    if update == "BOOM":
+                        man.spawn_Bomb(Map_O)
+                        continue
+                    elif update == "NewTarget":
+                        pos = man.Position()
+                        botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
+                    else:
+                        man.changeDirection(update)
+                        man.begin_running()
+
+    man_List.draw(screen)
     bomb_List.draw(screen)
     bush_List.draw(screen)
-    explotion_List.draw(screen)
-    man_List.draw(screen)
+
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second
     clock.tick(60)
-
+    # pygame.time.delay(100)
 # Close the window and quit.
 pygame.quit()
