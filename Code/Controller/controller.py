@@ -20,7 +20,7 @@ class controller_Object:
     def EventManager(self):
         pygame.event.pump()
         # update the button states
-        if(self.system == "Linix"):
+        if(self.system == "Darwin"):
             self.states = {
                 'A': self.player.get_button(11),
                 'UP': self.player.get_button(0),
