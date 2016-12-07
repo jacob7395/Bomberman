@@ -136,62 +136,49 @@ oldrects = pygame.Rect(10, 10, 10, 10)
 
 for man in man_List:
     pos = man.Position()
-    botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid) 
+    botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
 
 startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
 endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
 
-pygame.mixer.music.load(path_Assets + "StartScreen.wav") 
+pygame.mixer.music.load(path_Assets + "StartScreen.wav")
 pygame.mixer.music.play(-1,0.0)
 
 
-start = False
-while start :
-  screen.fill(BLACK)
-  startMenu.controllers(pygame.joystick.get_count())
-  startMenu.update(screen)
-  for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            start = False
-            break;
-        if event.type == pygame.MOUSEBUTTONDOWN :
-            pos = pygame.mouse.get_pos()
-            if startMenu.state == 0 :
-                keyPress = startMenu.keyPress(pos)
-                if keyPress == "playButton" :
-                    startMenu.state = 1
-                elif keyPress == "exitButton" :
-                    pygame.quit()
-                    # Need to make this exit the program properly
-            elif startMenu.state == 1:
-                keyPress = startMenu.keyPress(pos)
-                if keyPress == "confirmButton" :
-                    start = False
-                elif keyPress == "backButton" :
-                    startMenu.state = 0
-  pygame.display.flip()
 
+def start():
+    start = True
+    while start :
+      screen.fill(BLACK)
+      startMenu.controllers(pygame.joystick.get_count())
+      startMenu.update(screen)
+      for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start = False
+                break;
+            if event.type == pygame.MOUSEBUTTONDOWN :
+                pos = pygame.mouse.get_pos()
+                if startMenu.state == 0 :
+                    keyPress = startMenu.keyPress(pos)
+                    if keyPress == "playButton" :
+                        startMenu.state = 1
+                    elif keyPress == "exitButton" :
+                        pygame.quit()
+                        # Need to make this exit the program properly
+                elif startMenu.state == 1:
+                    keyPress = startMenu.keyPress(pos)
+                    if keyPress == "confirmButton" :
+                        start = False
+                    elif keyPress == "backButton" :
+                        startMenu.state = 0
+      pygame.display.flip()
+start()
 
+'''
 pygame.mixer.music.stop()
-pygame.mixer.music.load(path_Assets + "Battle.mp3") 
+pygame.mixer.music.load(path_Assets + "Battle.mp3")
 pygame.mixer.music.play(-1,0.0)
-
-
-gameOver = False
-while gameOver == True :
-  screen.fill(BLACK)
-  endScreen.update(screen)
-  for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            start = False
-            break;
-        if event.type == pygame.MOUSEBUTTONDOWN :
-            pos = pygame.mouse.get_pos()
-            keyPress = endScreen.keyPress(pos)
-            if keyPress == "mainMenuButton" :
-                print("Go back to the main menu")
-  pygame.display.flip()
-     
+'''
 
 
 # -------- Main Program Loop -----------
@@ -262,13 +249,13 @@ while not done:
     # --- Drawing code should go here
 
     background_List.draw(screen)
-    wall_List.draw(screen)    
+    wall_List.draw(screen)
     explotion_List.draw(screen)
 
     for man in man_List:
         if man.ID > 1 :
          #   pos = man.Position()
-         #   botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)  
+         #   botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
             if botList[man.ID].isSeeking == True :
                 pos = man.Position()
                 update = botList[man.ID].update([pos[0] / 34, pos[1] / 34], screen)
@@ -282,17 +269,38 @@ while not done:
                     else :
                         man.changeDirection(update)
                         man.begin_running()
-    
+
     man_List.draw(screen)
     bomb_List.draw(screen)
     bush_List.draw(screen)
 
 
-    
+    for man in man_List:
+        if len(man_List) == 1:
+                gameOver = True
+                while gameOver == True :
+                  basicfont = pygame.font.SysFont(None, 56)
+                  text = basicfont.render('Player ' + str(man.ID) + ' wins!', True, (255, 0, 0))
+                  screen.fill(BLACK)
+                  endScreen.update(screen)
+                  screen.blit(text,[714-480,150])
+
+                  for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            start = False
+                            break;
+                        if event.type == pygame.MOUSEBUTTONDOWN :
+                            pos = pygame.mouse.get_pos()
+                            keyPress = endScreen.keyPress(pos)
+                            if keyPress == "mainMenuButton" :
+                                start()
+                  pygame.display.flip()
+
+
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
     # --- Limit to 60 frames per second
     clock.tick(60)
-    pygame.time.delay(100)
+    #pygame.time.delay(100)
 # Close the window and quit.
 pygame.quit()

@@ -1,12 +1,13 @@
 import pygame
 import os
-import sys 
+import sys
 path = os.path.realpath(__file__)
 for i in range(0, 1):
     path = os.path.dirname(path)
 path_Josh = path + "/Josh"
 sys.path.insert(0, path_Josh)
 import button
+
 
 class GameEnd :
     def __init__(self, file_location , screen_Size):
@@ -20,12 +21,10 @@ class GameEnd :
 
     def keyPress(self, pos) :
         if self.mainMenuButton.get_Rect().collidepoint(pos):
-            return "mainMenuButton" 
+            return "mainMenuButton"
         else :
             return None
 
-    def update(self, display) :
-        display.blit(self.background, (0, 0))
+    def update(self, display):
+        display.blit(self.background,(0, 0))
         self.mainMenuButton.update(display)
-
-    
