@@ -69,71 +69,7 @@ spawn_Area = (-100, -50, 0, screen_Size[1])
 # Set game window
 pygame.display.set_caption("Bomberman")
 # -----------------------------------------------
-# Sprite populations and generation
-# This is a list of 'sprites.' Each pepe in the program is
-# added to this list. The list is managed by a class called 'Group.'
-# make backgroud using map reader Function
-# background runs in a threadList
-sprite_Lists = Map_Load(screen_Size, 21)
-background_List = sprite_Lists[0]
-bDrwan = False
-bush_List = sprite_Lists[1]
-bushes_to_Destroyed = []
-wall_List = sprite_Lists[2]
-sprite_Scale = sprite_Lists[3]
-Map_O = sprite_Lists[4]
-
-
-# bot = AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1))
-# bot.setList(Map_O.map_Grid)
-
-
-# for bush in Map_O.bush_List:
-# print(bush)
-# bomb group and factry init
-bomb_List = pygame.sprite.Group()
-explotion_List = pygame.sprite.Group()
-# make bomber man
-# get number of plugged in controllers
-number_Of_Players = 4
-man_List = pygame.sprite.Group()
-man_Factory = Class_Factory("Man", Sprite_Bomberman)
-man_Count = 0
-for tile in background_List:
-    if(tile.class_Name == "Spawn" and man_Count < number_Of_Players):
-        man = man_Factory.New(tile.Position(), False, sprite_Scale, man_Count)
-        man.AI = True
-        man_List.add(man)
-        man_Count += 1
-
-bot_Count = man_Count
-# controller initalization
-controllers = []
-for count in range(joystick.get_count()):
-    for bomberman in man_List:
-        if(bomberman.ID - 1 == count):
-            bomberman.AI = False
-            controllers.append(controller_Object(bomberman, count))
-
-botList = [""] * (len(man_List) + 1)
-for man in man_List:
-    if(man.AI == True):
-        botList[man.ID] = (AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
-        botList[man.ID].setList(Map_O.map_Grid)
-    else:
-        botList.append([])
-
-done = False
-# used to manage how fast the screen updates
-clock = pygame.time.Clock()
-oldrects = pygame.Rect(10, 10, 10, 10)
-
-for man in man_List:
-    # get a path to the target
-    if(man.AI == True):
-        botList[man.ID].findMan(man, Map_O, man_List)
-
-endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
+# Start and end screen
 
 
 def start_Screen(start=True):
@@ -168,135 +104,223 @@ def start_Screen(start=True):
         pygame.display.flip()
 
 
-start_Screen()
+def end_Screen(gameOver=True):
+    endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
+    while gameOver == True:
+        basicfont = pygame.font.SysFont(None, 56)
+        text = basicfont.render('Player ' + str(man.ID) + ' wins!', True, (255, 0, 0))
+        screen.fill(BLACK)
+        endScreen.update(screen)
+        screen.blit(text, [714 - 480, 150])
 
-# pygame.mixer.music.stop()
-# pygame.mixer.music.load(path_Assets + "Battle.mp3")
-# pygame.mixer.music.play(-1, 0.0)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return [False, False]
+                break
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                keyPress = endScreen.keyPress(pos)
+                return [True, True]
+        pygame.display.flip()
+# -----------------------------------------------
+run = True
+start_Menu = True
+# Main game loop
+while run == True:
+    # Sprite populations and generation
+    # This is a list of 'sprites.' Each pepe in the program is
+    # added to this list. The list is managed by a class called 'Group.'
+    # make backgroud using map reader Function
+    # background runs in a threadList
+    sprite_Lists = Map_Load(screen_Size, 21)
+    background_List = sprite_Lists[0]
+    bDrwan = False
+    bush_List = sprite_Lists[1]
+    bushes_to_Destroyed = []
+    wall_List = sprite_Lists[2]
+    sprite_Scale = sprite_Lists[3]
+    Map_O = sprite_Lists[4]
 
+    # bot = AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1))
+    # bot.setList(Map_O.map_Grid)
 
-gameOver = False
-while gameOver == True:
-    screen.fill(BLACK)
-    endScreen.update(screen)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            start = False
-            break
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            keyPress = endScreen.keyPress(pos)
-            if keyPress == "mainMenuButton":
-                print("Go back to the main menu")
-    pygame.display.flip()
+    # for bush in Map_O.bush_List:
+    # print(bush)
+    # bomb group and factry init
+    bomb_List = pygame.sprite.Group()
+    explotion_List = pygame.sprite.Group()
+    # make bomber man
+    # get number of plugged in controllers
+    number_Of_Players = 4
+    man_List = pygame.sprite.Group()
+    man_Factory = Class_Factory("Man", Sprite_Bomberman)
+    man_Count = 0
+    for tile in background_List:
+        if(tile.class_Name == "Spawn" and man_Count < number_Of_Players):
+            man = man_Factory.New(tile.Position(), False, sprite_Scale, man_Count)
+            man.AI = True
+            man_List.add(man)
+            man_Count += 1
 
+    bot_Count = man_Count
+    # controller initalization
+    controllers = []
+    for count in range(joystick.get_count()):
+        for bomberman in man_List:
+            if(bomberman.ID - 1 == count):
+                bomberman.AI = False
+                controllers.append(controller_Object(bomberman, count))
 
-# -------- Main Program Loop -----------
-while not done:
-    # --- Main event loop
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F1:
-                if scree_Fullscreen == True:
-                    screen = display.set_mode(screen_Size)
-                    scree_Fullscreen = False
-                else:
-                    screen = display.set_mode(screen_Size, pygame.FULLSCREEN)
-                    scree_Fullscreen = True
-            elif event.key == pygame.K_F2:
-                done = True
-    # --- Update controller logic loop
-    for controller in controllers:
-        controller.EventManager()
-
-    # --- Game logic should go hered
+    botList = [""] * (len(man_List) + 1)
     for man in man_List:
-        if man.AI == True:
-         #   pos = man.Position()
-         #   botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
-            # gets the tiles posion on the map object for the mans location
-            pos = (Map_O.pos_To_Location([man.get_Sprite_Center()]))[0]
-            # get the sprites coliton coreners
-            cornors = Map_O.pos_To_Location(man.get_Collision_Coners())
-            # check the postion is the same as all the conrets
-            equle = True
-            for p in cornors:
-                if(pos != p):
-                    equle = False
-            # if the posiont matches all the corners update the ai's position
-            if(equle == True):
-                botList[man.ID].moving_Pos = pos
+        if(man.AI == True):
+            botList[man.ID] = (AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1)))
+            botList[man.ID].setList(Map_O.map_Grid)
+        else:
+            botList.append([])
 
-            direction = botList[man.ID].update(screen, Map_O, man)
+    done = False
+    # used to manage how fast the screen updates
+    clock = pygame.time.Clock()
+    oldrects = pygame.Rect(10, 10, 10, 10)
 
-            if(botList[man.ID].path == None):
-                botList[man.ID].path = botList[man.ID].pathFinding.getPath(pos, (1, 1), Map_O.map_Grid)
+    for man in man_List:
+        # get a path to the target
+        if(man.AI == True):
+            botList[man.ID].findMan(man, Map_O, man_List)
 
-            if direction != None:
-                if direction == "BOOM":
-                    man.spawn_Bomb(Map_O)
-                    continue
+    start_Screen(start_Menu)
+
+    # pygame.mixer.music.stop()
+    # pygame.mixer.music.load(path_Assets + "Battle.mp3")
+    # pygame.mixer.music.play(-1, 0.0)
+
+    gameOver = False
+    while gameOver == True:
+        screen.fill(BLACK)
+        endScreen.update(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start = False
+                break
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                keyPress = endScreen.keyPress(pos)
+                if keyPress == "mainMenuButton":
+                    print("Go back to the main menu")
+        pygame.display.flip()
+
+    # -------- Main Program Loop -----------
+    while not done:
+        # --- Main event loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F1:
+                    if scree_Fullscreen == True:
+                        screen = display.set_mode(screen_Size)
+                        scree_Fullscreen = False
+                    else:
+                        screen = display.set_mode(screen_Size, pygame.FULLSCREEN)
+                        scree_Fullscreen = True
+                elif event.key == pygame.K_F2:
+                    done = True
+        # --- Update controller logic loop
+        for controller in controllers:
+            controller.EventManager()
+
+        # --- Game logic should go hered
+        for man in man_List:
+            if man.AI == True:
+             #   pos = man.Position()
+             #   botList[man.ID].getPath([int(pos[0] / 34), int(pos[1] / 34)], Map_O.map_Grid)
+                # gets the tiles posion on the map object for the mans location
+                pos = (Map_O.pos_To_Location([man.get_Sprite_Center()]))[0]
+                # get the sprites coliton coreners
+                cornors = Map_O.pos_To_Location(man.get_Collision_Coners())
+                # check the postion is the same as all the conrets
+                equle = True
+                for p in cornors:
+                    if(pos != p):
+                        equle = False
+                # if the posiont matches all the corners update the ai's position
+                if(equle == True):
+                    botList[man.ID].moving_Pos = pos
+
+                direction = botList[man.ID].update(screen, Map_O, man)
+
+                if(botList[man.ID].path == None):
+                    botList[man.ID].path = botList[man.ID].pathFinding.getPath(pos, (1, 1), Map_O.map_Grid)
+
+                if direction != None:
+                    if direction == "BOOM":
+                        man.spawn_Bomb(Map_O)
+                        continue
+                    else:
+                        man.changeDirection(direction)
+                        if(man.running == False):
+                            man.begin_running()
                 else:
-                    man.changeDirection(direction)
-                    if(man.running == False):
-                        man.begin_running()
-            else:
-                man.stop_running()
+                    man.stop_running()
 
-        bomb_List.add(man.update(Map_O))
-        # check if men are in explotion
+            bomb_List.add(man.update(Map_O))
+            # check if men are in explotion
+            for explotion in explotion_List:
+                # if a man is in any explotion remove them from existanceB
+                if(explotion.position_In_Collition(man.get_Sprite_Center()) == True):
+                    man_List.remove(man)
+
+        for bomb in bomb_List:
+            if(bomb.update(Map_O) == True):
+                tiles = Map_O.tile_At(bomb.get_Collision_Coners())
+                for tile in tiles:
+                    tile["Bomb"] = False
+                for explotion in bomb.explotion_List:
+                    explotion_List.remove(explotion)
+                    bomb.explotion_List.remove(explotion)
+                bomb.owner.bomb_List.remove(bomb)
+                bomb_List.remove(bomb)
+            if(len(bomb.explotion_List) > 0):
+                explotion_List.add(bomb.explotion_List)
+        # find all bushes that need to be desroyed
         for explotion in explotion_List:
-            # if a man is in any explotion remove them from existanceB
-            if(explotion.position_In_Collition(man.get_Sprite_Center()) == True):
-                man_List.remove(man)
+            for bush in explotion.bushes_to_Destroyed:
+                bushes_to_Destroyed.append(bush)
+                explotion.bushes_to_Destroyed = []
+        # if there is a bush to destroy find it then remove it form the game
+        if(len(bushes_to_Destroyed) > 0):
+            for bush in bush_List:
+                for bush_Destroy in bushes_to_Destroyed:
+                    if(bush.Position() == bush_Destroy):
+                        bush_List.remove(bush)
+        # --- Check win condition
+        if(len(man_List) == 6):
+            done = True
 
-    for bomb in bomb_List:
-        if(bomb.update(Map_O) == True):
-            tiles = Map_O.tile_At(bomb.get_Collision_Coners())
-            for tile in tiles:
-                tile["Bomb"] = False
-            for explotion in bomb.explotion_List:
-                explotion_List.remove(explotion)
-                bomb.explotion_List.remove(explotion)
-            bomb.owner.bomb_List.remove(bomb)
-            bomb_List.remove(bomb)
-        if(len(bomb.explotion_List) > 0):
-            explotion_List.add(bomb.explotion_List)
-    # find all bushes that need to be desroyed
-    for explotion in explotion_List:
-        for bush in explotion.bushes_to_Destroyed:
-            bushes_to_Destroyed.append(bush)
-            explotion.bushes_to_Destroyed = []
-    # if there is a bush to destroy find it then remove it form the game
-    if(len(bushes_to_Destroyed) > 0):
-        for bush in bush_List:
-            for bush_Destroy in bushes_to_Destroyed:
-                if(bush.Position() == bush_Destroy):
-                    bush_List.remove(bush)
-    # --- Check win condition
-    if(len(man_List) == 6):
-        done = True
+        # --- Screen-clearing code goes here
+        # Here, we clear the screen to white. Don't put other drawing commandsd
+        # above this, or they will be erased with this command.
+        # If you want a background image, replace this clear with blit'ing the
+        # background image.
+        # --- Drawing code should go here
 
-    # --- Screen-clearing code goes here
-    # Here, we clear the screen to white. Don't put other drawing commandsd
-    # above this, or they will be erased with this command.
-    # If you want a background image, replace this clear with blit'ing the
-    # background image.
-    # --- Drawing code should go here
+        background_List.draw(screen)
+        wall_List.draw(screen)
+        explotion_List.draw(screen)
+        man_List.draw(screen)
+        bomb_List.draw(screen)
+        bush_List.draw(screen)
 
-    background_List.draw(screen)
-    wall_List.draw(screen)
-    explotion_List.draw(screen)
-    man_List.draw(screen)
-    bomb_List.draw(screen)
-    bush_List.draw(screen)
+        if len(man_List) == 1:
+            done = True
 
-    # --- Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
-    # --- Limit to 60 frames per second
-    clock.tick(60)
-    # pygame.time.delay(100)
+        # --- Go ahead and update the screen with what we've drawn.
+        pygame.display.flip()
+        # --- Limit to 60 frames per second
+        clock.tick(60)
+    var = end_Screen()
+    run = var[0]
+    startMenu = var[1]
 # Close the window and quit.
 pygame.quit()
