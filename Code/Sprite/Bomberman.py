@@ -194,4 +194,5 @@ class Sprite_Bomberman(Player):
             self.bomb_Count += 1
             self.bomb_Start_Replenishment = False
 
+        self.bombs_Out = len(self.bomb_List)
         return self.bomb_List

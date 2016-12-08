@@ -9,6 +9,8 @@ class Dijkstra:
 # Need to optimize and add error handling if no available path/delete unused things
 
     def makeMoveable(self, x, y, state):
+        x = int(x)
+        y = int(y)
         self.validPosition[x][y] = state
 
     def initializeVariables(self):

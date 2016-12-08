@@ -131,13 +131,13 @@ oldrects = pygame.Rect(10, 10, 10, 10)
 for man in man_List:
     # get a path to the target
     if(man.AI == True):
-        botList[man.ID].findMan(man, man_List, Map_O)
+        botList[man.ID].findMan(man, Map_O, man_List)
 
 startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
 endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
 
-pygame.mixer.music.load(path_Assets + "StartScreen.wav")
-pygame.mixer.music.play(-1, 0.0)
+# pygame.mixer.music.load(path_Assets + "StartScreen.wav")
+# pygame.mixer.music.play(-1, 0.0)
 
 
 start = False
@@ -245,7 +245,7 @@ while not done:
         bomb_List.add(man.update(Map_O))
         # check if men are in explotion
         for explotion in explotion_List:
-            # if a man is in any explotion remove them from existance
+            # if a man is in any explotion remove them from existanceB
             if(explotion.position_In_Collition(man.get_Sprite_Center()) == True):
                 man_List.remove(man)
 
@@ -294,6 +294,6 @@ while not done:
     pygame.display.flip()
     # --- Limit to 60 frames per second
     clock.tick(60)
-    pygame.time.delay(100)
+    # pygame.time.delay(100)
 # Close the window and quit.
 pygame.quit()
