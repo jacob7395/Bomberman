@@ -23,7 +23,7 @@ class controller_Object:
         pygame.event.pump()
         # update the button states for lynix
         if(self.system == "Darwin"):
-            self.states = {'A': self.player.get_button(11)}
+            self.states.update({'A': self.player.get_button(11)})
 
             movmentStates = {'UP': self.player.get_button(0),
                              'DOWN': self.player.get_button(1),

@@ -133,43 +133,46 @@ for man in man_List:
     if(man.AI == True):
         botList[man.ID].findMan(man, Map_O, man_List)
 
-startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
 endScreen = GameEnd.GameEnd(path_Assets + "background.JPG", screen_Size)
 
-# pygame.mixer.music.load(path_Assets + "StartScreen.wav")
-# pygame.mixer.music.play(-1, 0.0)
+
+def start_Screen(start=True):
+    # start menu
+    startMenu = StartMenu.StartMenu(path_Assets + "background.JPG", screen_Size)
+    # Starts music
+    pygame.mixer.music.load(path_Assets + "StartScreen.wav")
+    pygame.mixer.music.play(-1, 0.0)
+    while start:
+        screen.fill(BLACK)
+        startMenu.controllers(pygame.joystick.get_count())
+        startMenu.update(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start = False
+                break
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if startMenu.state == 0:
+                    keyPress = startMenu.keyPress(pos)
+                    if keyPress == "playButton":
+                        startMenu.state = 1
+                    elif keyPress == "exitButton":
+                        pygame.quit()
+                        # Need to make this exit the program properly
+                elif startMenu.state == 1:
+                    keyPress = startMenu.keyPress(pos)
+                    if keyPress == "confirmButton":
+                        start = False
+                    elif keyPress == "backButton":
+                        startMenu.state = 0
+        pygame.display.flip()
 
 
-start = False
-while start:
-    screen.fill(BLACK)
-    startMenu.controllers(pygame.joystick.get_count())
-    startMenu.update(screen)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            start = False
-            break
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            if startMenu.state == 0:
-                keyPress = startMenu.keyPress(pos)
-                if keyPress == "playButton":
-                    startMenu.state = 1
-                elif keyPress == "exitButton":
-                    pygame.quit()
-                    # Need to make this exit the program properly
-            elif startMenu.state == 1:
-                keyPress = startMenu.keyPress(pos)
-                if keyPress == "confirmButton":
-                    start = False
-                elif keyPress == "backButton":
-                    startMenu.state = 0
-    pygame.display.flip()
-
+start_Screen()
 
 # pygame.mixer.music.stop()
 # pygame.mixer.music.load(path_Assets + "Battle.mp3")
-# pygame.mixer.music.play(-1,0.0)
+# pygame.mixer.music.play(-1, 0.0)
 
 
 gameOver = False
