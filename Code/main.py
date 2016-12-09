@@ -113,6 +113,8 @@ def start_Screen(start=True):
                     elif keyPress == "backButton":
                         startMenu.state = 0
         pygame.display.flip()
+        pygame.mixer.music.load(path_Assets + "Hucci  Stooki Sound - Ball So Hard.wav")
+        pygame.mixer.music.play(-1, 0.0)
 
 
 def end_Screen(gameOver=True):
