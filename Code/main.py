@@ -69,6 +69,9 @@ spawn_Area = (-100, -50, 0, screen_Size[1])
 # Set game window
 pygame.display.set_caption("Bomberman")
 # -----------------------------------------------
+# varibles for game running
+run = True
+start_Menu = True
 # Start and end screen
 
 
@@ -78,10 +81,15 @@ def start_Screen(start=True):
     # Starts music
     pygame.mixer.music.load(path_Assets + "StartScreen.wav")
     pygame.mixer.music.play(-1, 0.0)
+    # loop for the start screen
     while start:
+        # draw blank screen
         screen.fill(BLACK)
+        # use the start menu object to detect controlers
         startMenu.controllers(pygame.joystick.get_count())
+        # use object to update screen
         startMenu.update(screen)
+        # events to detect game
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 start = False
@@ -93,6 +101,9 @@ def start_Screen(start=True):
                     if keyPress == "playButton":
                         startMenu.state = 1
                     elif keyPress == "exitButton":
+                        # quit the game when exit is pressed
+                        gameOver = True
+                        run = False
                         pygame.quit()
                         # Need to make this exit the program properly
                 elif startMenu.state == 1:
@@ -123,8 +134,6 @@ def end_Screen(gameOver=True):
                 return [True, True]
         pygame.display.flip()
 # -----------------------------------------------
-run = True
-start_Menu = True
 # Main game loop
 while run == True:
     # Sprite populations and generation
