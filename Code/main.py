@@ -141,25 +141,21 @@ while run == True:
     # added to this list. The list is managed by a class called 'Group.'
     # make backgroud using map reader Function
     # background runs in a threadList
-    sprite_Lists = Map_Load(screen_Size, 21)
-    background_List = sprite_Lists[0]
-    bDrwan = False
-    bush_List = sprite_Lists[1]
+    return_Lists = Map_Load(screen_Size, 21)
+    # the map loader retiuns a list contanong diffrent infomation
+    background_List = return_Lists[0]
+    bush_List = return_Lists[1]
+    # a list used to indecate whitch bushs need to be removed
     bushes_to_Destroyed = []
-    wall_List = sprite_Lists[2]
-    sprite_Scale = sprite_Lists[3]
-    Map_O = sprite_Lists[4]
-
-    # bot = AIBot.AIBot(int(len(Map_O.map_Grid[0])), int(len(Map_O.map_Grid) - 1))
-    # bot.setList(Map_O.map_Grid)
-
-    # for bush in Map_O.bush_List:
-    # print(bush)
+    wall_List = return_Lists[2]
+    sprite_Scale = return_Lists[3]
+    Map_O = return_Lists[4]
     # bomb group and factry init
     bomb_List = pygame.sprite.Group()
     explotion_List = pygame.sprite.Group()
     # make bomber man
     # get number of plugged in controllers
+    # should change the number of players but doesnt work
     number_Of_Players = 4
     man_List = pygame.sprite.Group()
     man_Factory = Class_Factory("Man", Sprite_Bomberman)

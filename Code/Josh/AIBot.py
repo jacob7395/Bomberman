@@ -137,15 +137,17 @@ class AIBot:
 
     def check_For_Men(self, bomberman, map_Object):
         man = bomberman
-        # get a list of all men withouth me in it
+        # get a list of all men without me in it
         man_Positions = []
         for not_Me in self.man_List:
             if(not_Me.ID != man.ID):
+                # get the postion of each man then append it to the dic
                 pos = (map_Object.pos_To_Location([not_Me.get_Sprite_Center()]))[0]
                 man_Positions.append(pos)
-
+        # get the positon of the current man
         pos = (map_Object.pos_To_Location([bomberman.get_Sprite_Center()]))[0]
-
+        # for eahch man check if they are within 2 tiles of this bomberman
+        # if so the funciton return ture else it retuns false
         for there_Pos in man_Positions:
             dif_X = abs(pos[0] - there_Pos[0])
             dif_Y = abs(pos[1] - there_Pos[1])
@@ -159,13 +161,8 @@ class AIBot:
             if(currentPosition == self.path[0]):
                 self.back_Path.append(self.path.pop(0))
 
-            man_In_Range = self.check_For_Men(bomberman, map_Object)
-            if(man_In_Range == True):
-                self.path = None
-                return str("BOOM")
-
-            if(type(self.path[0]) == bool or man_In_Range == True):
-                if(self.path[0] == True or man_In_Range == True):
+            if(type(self.path[0]) == bool):
+                if(self.path[0] == True):
                     self.path = None
                     return str("BOOM")
                 else:
@@ -173,6 +170,14 @@ class AIBot:
                     return None
 
             targetPosition = self.path[0]
+
+            man_In_Range = self.check_For_Men(bomberman, map_Object)
+            if(man_In_Range == True):
+                if(random.randint(0, 100) > 50):
+                    self.path = None
+                    return str("BOOM")
+                else:
+                    self.find_Safe_Space(map_Object, bomberman)
 
             if(self.check_Safty(map_Object, self.moving_Pos) == False and self.path[-1] == True):
                 self.find_Safe_Space(map_Object, bomberman)
@@ -186,12 +191,12 @@ class AIBot:
             elif currentPosition[0] > targetPosition[0]:
                 return str("LEFT")
             else:
-                return None
+                self.path = None
         else:
             man_In_Range = self.check_For_Men(bomberman, map_Object)
             if(self.check_Safty(map_Object, self.moving_Pos) == False):
                 self.find_Safe_Space(map_Object, bomberman)
-            elif(bomberman.bombs_Out == 0):
+            elif(bomberman.bombs_Out <= 0):
                 self.findMan(bomberman, map_Object)
             elif(man_In_Range == True):
                 if(random.randrange(0, 100) >= 75):
